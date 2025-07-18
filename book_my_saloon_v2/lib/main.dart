@@ -5,10 +5,19 @@ import 'package:provider/provider.dart';
 import 'package:book_my_saloon/screens/auth/login_screen.dart';
 import 'package:book_my_saloon/screens/home_screen.dart';
 import 'package:book_my_saloon/services/auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: dotenv.env['API_KEY'] ?? '',
+      appId: dotenv.env['APP_ID'] ?? '',
+      messagingSenderId: dotenv.env['MESSAGING_SENDER_ID'] ?? '',
+      projectId: dotenv.env['PROJECT_ID'] ?? '',
+    ),
+  );
   runApp(const MyApp());
 }
 
