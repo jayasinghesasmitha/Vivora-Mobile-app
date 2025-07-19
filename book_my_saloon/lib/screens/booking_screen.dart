@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:book_my_saloon/utils/colors.dart';
-import 'package:book_my_saloon/utils/styles.dart';
-import 'package:book_my_saloon/widgets/custom_button.dart';
-import 'package:book_my_saloon/screens/booking_confirmation_screen.dart';
+import 'package:book_my_saloon/screens/auth/login_screen.dart'; // Import the login screen
 
 class BookingScreen extends StatefulWidget {
   final String saloonName;
@@ -15,138 +11,191 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
-  String _selectedService = 'Haircut';
-  final List<String> _services = [
-    'Haircut',
-    'Shave',
-    'Hair Color',
-    'Facial',
-    'Massage'
-  ];
+  String selectedEmployee = 'Any';
+  String selectedDate = '18';
+  List<String> selectedTimeSlots = [];
+  bool isConfirmed = false;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 30)),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
-  }
-
-  void _confirmBooking() {
-    if (_selectedDate == null || _selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select date and time')),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BookingConfirmationScreen(
-          saloonName: widget.saloonName,
-          service: _selectedService,
-          date: _selectedDate!,
-          time: _selectedTime!,
-        ),
-      ),
-    );
-  }
+  // Employee data with their available time slots per date
+  final Map<String, Map<String, List<String>>> employeeSlots = {
+    'Kamal': {
+      '18': ['9:00', '9:30', '10:00'],
+      '19': ['9:00', '9:30', '10:00'],
+      '20': ['9:00', '9:30', '10:00'],
+    },
+    'Vimal': {
+      '18': ['11:00', '11:30', '12:00'],
+      '19': ['11:00', '11:30', '12:00'],
+      '20': ['11:00', '11:30', '12:00'],
+    },
+    'Sunil': {
+      '18': ['15:00', '16:00'],
+      '19': ['15:00', '16:00'],
+      '20': ['15:00'], // Removed 16:00 slot for 20th
+    },
+  };
 
   @override
   Widget build(BuildContext context) {
+    List<String> availableSlots = [];
+    if (selectedEmployee == 'Any') {
+      employeeSlots.forEach((_, dateSlots) {
+        availableSlots.addAll(dateSlots[selectedDate] ?? []);
+      });
+    } else {
+      availableSlots = employeeSlots[selectedEmployee]?[selectedDate] ?? [];
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Book ${widget.saloonName}', style: AppStyles.appBarStyle),
-        backgroundColor: AppColors.primaryColor,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // VIVORA Logo
             Text(
-              'Select Service',
-              style: AppStyles.sectionHeadingStyle,
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: _selectedService,
-              items: _services.map((String service) {
-                return DropdownMenuItem<String>(
-                  value: service,
-                  child: Text(service),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedService = newValue!;
-                });
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+              'VIVORA',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                // Using a similar font (replace with actual font if available)
+                fontFamily: 'Roboto', // Placeholder font, adjust as needed
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 20),
+            // Saloon Name
             Text(
-              'Select Date & Time',
-              style: AppStyles.sectionHeadingStyle,
+              widget.saloonName,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 20),
+            // Date Selection
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(
-                  child: CustomButton(
-                    text: _selectedDate == null
-                        ? 'Select Date'
-                        : DateFormat('MMM dd, yyyy').format(_selectedDate!),
-                    onPressed: () => _selectDate(context),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: CustomButton(
-                    text: _selectedTime == null
-                        ? 'Select Time'
-                        : _selectedTime!.format(context),
-                    onPressed: () => _selectTime(context),
-                  ),
-                ),
+                _buildDateButton('18'),
+                _buildDateButton('19'),
+                _buildDateButton('20'),
               ],
             ),
-            const Spacer(),
-            CustomButton(
-              text: 'Confirm Booking',
-              onPressed: _confirmBooking,
+            SizedBox(height: 20),
+            // Employee Selection
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildEmployeeButton('Any'),
+                _buildEmployeeButton('Kamal'),
+                _buildEmployeeButton('Vimal'),
+                _buildEmployeeButton('Sunil'),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Time Slots
+            Expanded(
+              child: ListView.builder(
+                itemCount: availableSlots.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (selectedTimeSlots.contains(availableSlots[index])) {
+                            selectedTimeSlots.remove(availableSlots[index]);
+                          } else {
+                            selectedTimeSlots.add(availableSlots[index]);
+                          }
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selectedTimeSlots.contains(availableSlots[index])
+                            ? Colors.grey
+                            : null,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(availableSlots[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Confirm Button
+            ElevatedButton(
+              onPressed: selectedTimeSlots.isNotEmpty && !isConfirmed
+                  ? () {
+                      setState(() {
+                        isConfirmed = true;
+                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text('Confirm'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDateButton(String date) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedDate = date;
+          selectedTimeSlots.clear();
+        });
+      },
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: selectedDate == date ? Colors.black : Colors.grey,
+            child: Text(
+              date,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 5),
+          Text('July'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmployeeButton(String name) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedEmployee = name;
+          selectedTimeSlots.clear();
+        });
+      },
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'images/placeholder.png',
+              fit: BoxFit.cover,
+              width: 50,
+              height: 50,
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(name),
+        ],
       ),
     );
   }
