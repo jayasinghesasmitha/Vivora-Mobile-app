@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:book_my_saloon/services/auth_service.dart';
-import 'package:book_my_saloon/widgets/custom_button.dart';
-import 'package:book_my_saloon/widgets/custom_textfield.dart';
-import 'package:book_my_saloon/utils/colors.dart';
-import 'package:book_my_saloon/utils/styles.dart';
-import 'package:book_my_saloon/screens/auth/signup_screen.dart';
-import 'package:book_my_saloon/screens/home_screen.dart';
+import 'package:book_my_saloon/screens/booking_confirmation_screen.dart'; // Import the confirmation screen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -26,27 +19,136 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
-      
-      try {
-        await AuthService().loginUser(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
-        
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Login failed')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+
+      // Simulate login without database and pass dummy data
+      await Future.delayed(Duration(seconds: 1)); // Simulate network delay
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BookingConfirmationScreen(
+            saloonName: "VIVORA Salon", // Placeholder saloon name
+            service: "Haircut", // Placeholder service
+            date: DateTime(2024, 6, 19), // Placeholder date as DateTime
+            time: TimeOfDay(hour: 10, minute: 0), // Placeholder time
+          ),
+        ),
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // VIVORA Logo
+            Text(
+              'VIVORA',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontFamily: 'Roboto', // Placeholder font, adjust as needed
+              ),
+            ),
+            SizedBox(height: 20),
+            // Login or Sign up text
+            Text(
+              'Log in or Sign up',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Create an account or log in to continue with your booking',
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            // Social Login Buttons
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        // Placeholder for Google login implementation
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Google login not implemented yet')),
+                        );
+                      },
+                      icon: Image.network(
+                        'https://www.google.com/favicon.ico', // Google logo placeholder
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.cover,
+                      ),
+                      label: Text('Continue with Google'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black, backgroundColor: Colors.white,
+                        side: BorderSide(color: Colors.grey),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            // Email Login Form
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text('Login'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -54,92 +156,5 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  Text(
-                    'Book My Saloon',
-                    style: AppStyles.headingStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Login to your account',
-                    style: AppStyles.subHeadingStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
-                  CustomTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    hint: 'Enter your email',
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: _passwordController,
-                    label: 'Password',
-                    hint: 'Enter your password',
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 30),
-                  CustomButton(
-                    text: 'Login',
-                    onPressed: _login,
-                    isLoading: _isLoading,
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SignupScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Don\'t have an account? Sign up',
-                      style: AppStyles.linkStyle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
