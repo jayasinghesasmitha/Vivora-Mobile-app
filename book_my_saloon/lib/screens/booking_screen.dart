@@ -22,16 +22,19 @@ class _BookingScreenState extends State<BookingScreen> {
       '18': ['9:00', '9:30', '10:00'],
       '19': ['9:00', '9:30', '10:00'],
       '20': ['9:00', '9:30', '10:00'],
+      for (int i = 1; i <= 31; i++) if (i != 20) '$i': ['9:00', '9:30', '10:00'],
     },
     'Vimal': {
       '18': ['11:00', '11:30', '12:00'],
       '19': ['11:00', '11:30', '12:00'],
       '20': ['11:00', '11:30', '12:00'],
+      for (int i = 1; i <= 31; i++) if (i != 20) '$i': ['11:00', '11:30', '12:00'],
     },
     'Sunil': {
       '18': ['15:00', '16:00'],
       '19': ['15:00', '16:00'],
       '20': ['15:00'], // Removed 16:00 slot for 20th
+      for (int i = 1; i <= 31; i++) if (i != 20) '$i': ['15:00', '16:00'],
     },
   };
 
@@ -70,14 +73,41 @@ class _BookingScreenState extends State<BookingScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            // Date Selection
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildDateButton('18'),
-                _buildDateButton('19'),
-                _buildDateButton('20'),
-              ],
+            // Date Selection with Horizontal Scroll
+            SizedBox(
+              height: 70,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 31,
+                itemBuilder: (context, index) {
+                  final date = (index + 1).toString();
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedDate = date;
+                        selectedTimeSlots.clear();
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: selectedDate == date ? Colors.black : Colors.grey,
+                            child: Text(
+                              date,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text('July'),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
             SizedBox(height: 20),
             // Employee Selection
@@ -145,31 +175,6 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDateButton(String date) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedDate = date;
-          selectedTimeSlots.clear();
-        });
-      },
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: selectedDate == date ? Colors.black : Colors.grey,
-            child: Text(
-              date,
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          SizedBox(height: 5),
-          Text('July'),
-        ],
       ),
     );
   }
