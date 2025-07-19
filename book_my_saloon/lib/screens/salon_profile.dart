@@ -11,6 +11,7 @@ class SalonProfile extends StatefulWidget {
 }
 
 class _SalonProfileState extends State<SalonProfile> {
+  late PageController _pageController;
   Map<String, bool> selectedServices = {
     "Hair Cutting and Shaving": false,
     "Oil Massage": false,
@@ -40,7 +41,29 @@ class _SalonProfileState extends State<SalonProfile> {
       .fold(0, (a, b) => a + b);
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: 0,
+      viewportFraction: 0.7, // 70% of width for current image
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // List of salon images (replace with actual image paths)
+    final List<String> salonImages = [
+      'images/salon.jpg',
+      'images/salon.jpg',
+      'images/salon.jpg',
+    ];
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -64,6 +87,9 @@ class _SalonProfileState extends State<SalonProfile> {
                     'images/salon_image.jpg',
                     height: 50,
                     width: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error, color: Colors.red);
+                    },
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -84,11 +110,42 @@ class _SalonProfileState extends State<SalonProfile> {
                 ],
               ),
               const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'images/salon.jpg', // Replace with actual salon image
-                  fit: BoxFit.cover,
+              // Horizontal Scrollable Image Gallery
+              SizedBox(
+                height: 200,
+                child: PageView.builder(
+                  itemCount: salonImages.length,
+                  controller: _pageController,
+                  itemBuilder: (context, index) {
+                    return AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        final pageOffset = (index - (_pageController.page ?? 0)).abs();
+                        final scale = pageOffset == 0 ? 1.0 : 0.7; // Current image is full size
+                        return Transform.scale(
+                          scale: scale,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                salonImages[index],
+                                fit: BoxFit.cover,
+                                width: 200,
+                                height: 200,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey,
+                                    child: Center(child: Text('Image Error')),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 24),
@@ -142,7 +199,7 @@ class _SalonProfileState extends State<SalonProfile> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const BookingScreen(saloonName: '',)),
+                        builder: (context) => BookingScreen(saloonName: widget.salonName)),
                   );
                 },
                 child: const Text("Proceed",
