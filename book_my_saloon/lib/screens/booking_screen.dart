@@ -170,6 +170,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
+                // Disable button when onPressed is null
               ),
               child: Text('Confirm'),
             ),
