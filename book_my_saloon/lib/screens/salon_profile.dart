@@ -61,7 +61,7 @@ class _SalonProfileState extends State<SalonProfile> {
               Row(
                 children: [
                   Image.asset(
-                    'images/placeholder.png',
+                    'images/salon_image.jpg',
                     height: 50,
                     width: 50,
                   ),
@@ -87,7 +87,7 @@ class _SalonProfileState extends State<SalonProfile> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
-                  'images/salon_image.jpg', // Replace with actual salon image
+                  'images/salon.jpg', // Replace with actual salon image
                   fit: BoxFit.cover,
                 ),
               ),
