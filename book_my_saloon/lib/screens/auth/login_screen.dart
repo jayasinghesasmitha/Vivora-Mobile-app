@@ -29,7 +29,9 @@ class _LoginScreenState extends State<LoginScreen> {
             saloonName: "VIVORA Salon", // Placeholder saloon name
             service: "Haircut", // Placeholder service
             date: DateTime(2024, 6, 19), // Placeholder date as DateTime
-            time: TimeOfDay(hour: 10, minute: 0), // Placeholder time
+            time: TimeOfDay(hour: 10, minute: 0), 
+            selectedEmployee: "John Doe", // Placeholder employee
+            selectedTimeSlots: ['10:00', '11:00'], // Placeholder time slots
           ),
         ),
       );
