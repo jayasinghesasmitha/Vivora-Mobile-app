@@ -19,7 +19,10 @@ class SaloonCard extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage('https://via.placeholder.com/50'), // Replace with salon image URL
+          // Replace with a local asset or remove NetworkImage
+          child: Icon(Icons.store, color: Colors.grey), // Temporary fallback
+          // Alternatively, add an asset: Ensure assets are defined in pubspec.yaml
+          backgroundImage: const AssetImage('components/images/placeholder.png'),
         ),
         title: Text(name),
         subtitle: Column(
