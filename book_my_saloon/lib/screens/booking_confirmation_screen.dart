@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:book_my_saloon/utils/colors.dart';
-import 'package:book_my_saloon/utils/styles.dart';
-import 'package:book_my_saloon/widgets/custom_button.dart';
+import 'package:intl/intl.dart'; // For date and time formatting
+import 'package:book_my_saloon/screens/home_screen.dart'; // Import the home screen
 
 class BookingConfirmationScreen extends StatelessWidget {
   final String saloonName;
@@ -20,62 +18,144 @@ class BookingConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sample service prices (to be adjusted based on actual data)
+    final Map<String, double> servicePrices = {
+      'Hair Cutting and Shaving': 1400.0,
+      'Oil Massage': 1400.0,
+      'Beard Trimming': 1400.0,
+    };
+    final double servicePrice = servicePrices[service] ?? 0.0;
+    final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+    final String formattedDate = dateFormat.format(date);
+    final String startTime = '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+    final String endTime = '${time.hour}:${(time.minute + 45).toString().padLeft(2, '0')}';
+    final double total = servicePrice; // Assuming single service for now
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Booking Confirmation', style: AppStyles.appBarStyle),
-        backgroundColor: AppColors.primaryColor,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // VIVORA Logo
             Text(
-              'Booking Details',
-              style: AppStyles.headingStyle,
+              'VIVORA',
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontFamily: 'Roboto', // Placeholder font, adjust as needed
+              ),
             ),
-            const SizedBox(height: 20),
-            _buildDetailRow('Saloon:', saloonName),
-            _buildDetailRow('Service:', service),
-            _buildDetailRow(
-              'Date:', 
-              DateFormat('MMM dd, yyyy').format(date),
+            SizedBox(height: 20),
+            // Booking Confirmed Text
+            Text(
+              'Booking Confirmed',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            _buildDetailRow(
-              'Time:', 
-              time.format(context),
+            SizedBox(height: 20),
+            // Salon Logo
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'images/salon.jpg', // Replace with actual salon image
+                fit: BoxFit.cover,
+                width: 100,
+                height: 100,
+              ),
             ),
-            const Spacer(),
-            CustomButton(
-              text: 'Confirm Booking',
-              onPressed: () {
-                // Save booking and navigate
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
+            SizedBox(height: 10),
+            // Salon Name and Location
+            Text(
+              saloonName,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Colombo',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 20),
+            // Services
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(service, style: TextStyle(fontSize: 16)),
+                Text('Rs $servicePrice', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            SizedBox(height: 10),
+            // Additional Services (Placeholder, to be dynamic from salon_profile.dart)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Oil Massage', style: TextStyle(fontSize: 16)),
+                Text('Rs 1400', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Beard Trimming', style: TextStyle(fontSize: 16)),
+                Text('Rs 1400', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Pay at Venue
+            Row(
+              children: [
+                Icon(Icons.payment, color: Colors.grey),
+                SizedBox(width: 5),
+                Text('Pay at Venue', style: TextStyle(fontSize: 16, color: Colors.grey)),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Time Slot
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Time Slot', style: TextStyle(fontSize: 16)),
+                Text('$startTime - $endTime', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            SizedBox(height: 10),
+            // Duration
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Duration', style: TextStyle(fontSize: 16)),
+                Text('45 minutes', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            SizedBox(height: 10),
+            // Total
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Total', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Rs $total', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            SizedBox(height: 20),
+            // Back to Home Button
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text('Back to Home'),
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: AppStyles.subHeadingStyle.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            value,
-            style: AppStyles.subHeadingStyle,
-          ),
-        ],
       ),
     );
   }
