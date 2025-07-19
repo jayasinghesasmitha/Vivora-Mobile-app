@@ -120,10 +120,13 @@ class _SalonProfileState extends State<SalonProfile> {
                     return AnimatedBuilder(
                       animation: _pageController,
                       builder: (context, child) {
-                        final pageOffset = (index - (_pageController.page ?? 0)).abs();
-                        final scale = pageOffset == 0 ? 1.0 : 0.7; // Current image is full size
+                        double value = 1.0;
+                        if (_pageController.position.hasPixels) {
+                          value = _pageController.page! - index;
+                          value = (1 - (value.abs() * 0.3)).clamp(0.7, 1.0); // Smooth scale transition
+                        }
                         return Transform.scale(
-                          scale: scale,
+                          scale: Curves.easeInOut.transform(value),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: ClipRRect(
