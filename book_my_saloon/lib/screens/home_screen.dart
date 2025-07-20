@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    flex: 2,
+                    flex: 1, // Reduced height of the map
                     child: FlutterMap(
                       options: MapOptions(
                         center: _currentLocation ?? latLng.LatLng(6.9271, 79.8612),
@@ -220,6 +220,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         );
                       },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Implement navigation to My Current Bookings screen
+                        },
+                        child: const Text('My Current Bookings'),
+                      ),
                     ),
                   ),
                 ],
