@@ -5,6 +5,7 @@ import 'package:book_my_saloon/utils/colors.dart';
 import 'package:book_my_saloon/utils/styles.dart';
 import 'package:book_my_saloon/widgets/saloon_card.dart';
 import 'package:book_my_saloon/screens/salon_profile.dart';
+import 'package:book_my_saloon/screens/current_booking.dart';
 import 'package:geolocator/geolocator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -228,7 +229,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Implement navigation to My Current Bookings screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CurrentBooking(),
+                            ),
+                          );
                         },
                         child: const Text('My Current Bookings'),
                       ),
