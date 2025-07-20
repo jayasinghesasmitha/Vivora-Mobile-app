@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:book_my_saloon/screens/booking_confirmation_screen.dart'; // Import the confirmation screen
+import 'package:book_my_saloon/screens/booking_confirmation_screen.dart';
+import 'package:book_my_saloon/screens/auth/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -143,6 +144,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: _isLoading
                         ? CircularProgressIndicator(color: Colors.white)
                         : Text('Login'),
+                  ),
+                  SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignupScreen()),
+                      );
+                    },
+                    child: Text('Not registered yet, then register'),
                   ),
                 ],
               ),
