@@ -12,33 +12,31 @@ class SalonProfile extends StatefulWidget {
 
 class _SalonProfileState extends State<SalonProfile> {
   late PageController _pageController;
-  Map<String, bool> selectedServices = {
-    "Hair Cutting and Shaving": false,
-    "Oil Massage": false,
-    "Beard Trimming": false,
+  String selectedGender = 'Male'; // Default gender
+  final TextEditingController _searchController = TextEditingController();
+
+  // Service definitions based on gender
+  Map<String, Map<String, dynamic>> genderServices = {
+    'Male': {
+      "Hair Cutting and Shaving": {"price": 100, "duration": 60},
+      "Oil Massage": {"price": 200, "duration": 120},
+      "Beard Trimming": {"price": 300, "duration": 180},
+    },
+    'Female': {
+      "Hair Cutting and Shaving": {"price": 100, "duration": 60},
+      "Oil Massage": {"price": 200, "duration": 120},
+      "Beard Trimming": {"price": 300, "duration": 180},
+      "Nail Painting": {"price": 400, "duration": 90},
+    },
+    'Children': {
+      "Hair Cutting and Shaving": {"price": 50, "duration": 30},
+    },
+    'Unisex': {
+      "Oil Massage": {"price": 200, "duration": 120},
+    },
   };
 
-  Map<String, int> servicePrices = {
-    "Hair Cutting and Shaving": 100,
-    "Oil Massage": 200,
-    "Beard Trimming": 300,
-  };
-
-  Map<String, int> serviceDurations = {
-    "Hair Cutting and Shaving": 60,   // minutes
-    "Oil Massage": 120,
-    "Beard Trimming": 180,
-  };
-
-  int get totalCost => selectedServices.entries
-      .where((e) => e.value)
-      .map((e) => servicePrices[e.key]!)
-      .fold(0, (a, b) => a + b);
-
-  int get totalDuration => selectedServices.entries
-      .where((e) => e.value)
-      .map((e) => serviceDurations[e.key]!)
-      .fold(0, (a, b) => a + b);
+  Map<String, bool> selectedServices = {};
 
   @override
   void initState() {
@@ -47,17 +45,53 @@ class _SalonProfileState extends State<SalonProfile> {
       initialPage: 0,
       viewportFraction: 0.7, // 70% of width for current image
     );
+    // Initialize selected services with default gender (Male)
+    selectedServices = genderServices['Male']!.map((key, value) => MapEntry(key, false));
+    _searchController.addListener(_filterServices);
+  }
+
+  void _filterServices() {
+    setState(() {
+      if (_searchController.text.isEmpty) {
+        selectedServices = genderServices[selectedGender]!.map((key, value) => MapEntry(key, selectedServices[key] ?? false));
+      } else {
+        selectedServices = Map.fromEntries(
+          genderServices[selectedGender]!
+              .map((key, value) => MapEntry(key, selectedServices[key] ?? false))
+              .entries
+              .where((entry) => entry.key.toLowerCase().contains(_searchController.text.toLowerCase()))
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
+  void _updateServices(String gender) {
+    setState(() {
+      selectedGender = gender;
+      selectedServices = genderServices[gender]!.map((key, value) => MapEntry(key, false));
+      _searchController.text = ''; // Clear search when gender changes
+    });
+  }
+
+  int get totalCost => selectedServices.entries
+      .where((e) => e.value)
+      .map((e) => genderServices[selectedGender]![e.key]!['price'])
+      .fold<num>(0, (a, b) => a + b).toInt();
+
+  int get totalDuration => selectedServices.entries
+      .where((e) => e.value)
+      .map((e) => genderServices[selectedGender]![e.key]!['duration'])
+      .fold<num>(0, (a, b) => a + b).toInt();
+
   @override
   Widget build(BuildContext context) {
-    // List of salon images (replace with actual image paths)
     final List<String> salonImages = [
       'images/salon.jpg',
       'images/salon.jpg',
@@ -152,6 +186,37 @@ class _SalonProfileState extends State<SalonProfile> {
                 ),
               ),
               const SizedBox(height: 24),
+              // Gender Selection with smaller buttons and adjusted spacing
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: ['Male', 'Female', 'Children', 'Unisex'].map((gender) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0), // Reduced space between buttons
+                    child: ElevatedButton(
+                      onPressed: () => _updateServices(gender),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selectedGender == gender ? Colors.black : Colors.grey,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Smaller padding
+                        textStyle: const TextStyle(fontSize: 12), // Smaller text
+                      ),
+                      child: Text(gender),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              // Service Search Bar
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search services...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               const Text("Services",
                   style: TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold)),
@@ -159,7 +224,7 @@ class _SalonProfileState extends State<SalonProfile> {
               ...selectedServices.keys.map((service) {
                 return CheckboxListTile(
                   title: Text(service),
-                  subtitle: Text('Rs ${servicePrices[service]}'),
+                  subtitle: Text('Rs ${genderServices[selectedGender]![service]!['price']}'),
                   value: selectedServices[service],
                   onChanged: (bool? value) {
                     setState(() {
