@@ -100,6 +100,8 @@ class _UserProfileState extends State<UserProfile> {
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'My Bookings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
+        currentIndex: 2, // Highlight the Profile icon
+        selectedItemColor: Colors.black, // Highlighted icon color
         onTap: (index) {
           switch (index) {
             case 0:
