@@ -190,7 +190,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
+                                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
