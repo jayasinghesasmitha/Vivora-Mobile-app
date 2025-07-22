@@ -38,6 +38,9 @@ class _BookingScreenState extends State<BookingScreen> {
     },
   };
 
+  // Pricing logic (example: Rs 500 per time slot)
+  int get totalPrice => selectedTimeSlots.length * 500;
+
   @override
   Widget build(BuildContext context) {
     List<String> availableSlots = [];
@@ -152,6 +155,58 @@ class _BookingScreenState extends State<BookingScreen> {
                 },
               ),
             ),
+            // Booking Details Section
+            if (selectedTimeSlots.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Your Booking Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Employee: ${selectedEmployee}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                    Text(
+                      'Date: ${selectedDate} July 2025',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                    Text(
+                      'Time Slots: ${selectedTimeSlots.join(', ')}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                    Text(
+                      'Total Price: Rs $totalPrice',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             // Confirm Button
             ElevatedButton(
               onPressed: selectedTimeSlots.isNotEmpty && !isConfirmed
@@ -172,7 +227,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
                 // Disable button when onPressed is null
               ),
-              child: Text('Confirm'),
+              child: const Text('Confirm'),
             ),
           ],
         ),
