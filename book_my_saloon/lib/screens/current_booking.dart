@@ -37,29 +37,37 @@ class _CurrentBookingState extends State<CurrentBooking> {
       builder: (BuildContext context) {
         final booking = bookings[index];
         return AlertDialog(
-          title: const Text('Cancel Booking'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Salon: ${booking['salonName']}'),
-              Text('Location: ${booking['location']}'),
-              Text('Services: ${booking['services'].join(', ')}'),
-              Text('Date: ${booking['date']}'),
-              Text('Time: ${booking['timeSlot']}'),
-              Text('Price: ${booking['price']}'),
-              const SizedBox(height: 10),
-              const Text(
-                'Are you sure you want to cancel this booking?',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'Cancel Booking',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          content: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Cancelling this booking delete all data regarding your booking and this process is irreversible.',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
               },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                backgroundColor: Colors.grey[200],
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
               child: const Text('CANCEL'),
             ),
             TextButton(
@@ -72,9 +80,16 @@ class _CurrentBookingState extends State<CurrentBooking> {
                   const SnackBar(content: Text('Booking cancelled successfully')),
                 );
               },
-              child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                backgroundColor: Colors.red[400],
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('DELETE', style: TextStyle(color: Colors.white)),
             ),
           ],
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
         );
       },
     );
