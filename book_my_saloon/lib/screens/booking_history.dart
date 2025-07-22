@@ -3,30 +3,82 @@ import 'package:book_my_saloon/screens/home_screen.dart';
 import 'package:book_my_saloon/screens/current_booking.dart';
 import 'package:book_my_saloon/screens/user_profile.dart';
 
-class BookingHistory extends StatelessWidget {
+class BookingHistory extends StatefulWidget {
   const BookingHistory({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> bookings = [
-      {
-        'salonName': 'Liyo Salon',
-        'location': 'Colombo',
-        'services': ['Hair Cutting and Shaving', 'Oil Massage', 'Beard Trimming'],
-        'date': '27 July 2025',
-        'timeSlot': '10:00 am - 10:45 am',
-        'price': 'Rs 1700',
-      },
-      {
-        'salonName': 'Liyo Salon',
-        'location': 'Colombo',
-        'services': ['Hair Cutting and Shaving', 'Oil Massage', 'Beard Trimming'],
-        'date': '27 July 2025',
-        'timeSlot': '10:00 am - 10:45 am',
-        'price': 'Rs 1700',
-      },
-    ];
+  _BookingHistoryState createState() => _BookingHistoryState();
+}
 
+class _BookingHistoryState extends State<BookingHistory> {
+  final List<Map<String, dynamic>> bookings = [
+    {
+      'salonName': 'Liyo Salon',
+      'location': 'Colombo',
+      'services': ['Hair Cutting and Shaving', 'Oil Massage', 'Beard Trimming'],
+      'date': '27 July 2025',
+      'timeSlot': '10:00 am - 10:45 am',
+      'price': 'Rs 1700',
+      'rating': 0.0, // Initialize rating as 0
+      'isRated': false, // Track if rating is finalized
+    },
+    {
+      'salonName': 'Liyo Salon',
+      'location': 'Colombo',
+      'services': ['Hair Cutting and Shaving', 'Oil Massage', 'Beard Trimming'],
+      'date': '27 July 2025',
+      'timeSlot': '10:00 am - 10:45 am',
+      'price': 'Rs 1700',
+      'rating': 0.0, // Initialize rating as 0
+      'isRated': false, // Track if rating is finalized
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showUnratedBookingsPopup();
+    });
+  }
+
+  void _showUnratedBookingsPopup() {
+    final unratedCount = bookings.where((booking) => booking['rating'] == 0.0).length;
+    if (unratedCount > 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Unrated Bookings'),
+            content: Text('You have $unratedCount unrated booking(s). Please rate them!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _setRating(int index, double rating) {
+    setState(() {
+      bookings[index]['rating'] = rating;
+    });
+  }
+
+  void _confirmRating(int index) {
+    setState(() {
+      bookings[index]['isRated'] = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -104,6 +156,70 @@ class BookingHistory extends StatelessWidget {
                           Text(
                             booking['timeSlot'],
                             style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Rate Us: ',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              if (!booking['isRated']) ...[
+                                Row(
+                                  children: List.generate(5, (starIndex) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _setRating(index, (starIndex + 1).toDouble());
+                                      },
+                                      child: Icon(
+                                        Icons.star,
+                                        color: starIndex < booking['rating']
+                                            ? Colors.amber
+                                            : Colors.grey[400],
+                                        size: 24,
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(width: 10),
+                                ElevatedButton(
+                                  onPressed: booking['rating'] > 0
+                                      ? () {
+                                          _confirmRating(index);
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text('Rate'),
+                                ),
+                              ] else ...[
+                                Row(
+                                  children: List.generate(5, (starIndex) {
+                                    return Icon(
+                                      Icons.star,
+                                      color: starIndex < booking['rating']
+                                          ? Colors.amber
+                                          : Colors.grey[400],
+                                      size: 24,
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Rating: ${booking['rating'].toInt()} stars',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),
