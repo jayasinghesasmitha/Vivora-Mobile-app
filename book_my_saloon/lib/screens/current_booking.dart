@@ -31,6 +31,55 @@ class _CurrentBookingState extends State<CurrentBooking> {
     },
   ];
 
+  void _showCancelConfirmation(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final booking = bookings[index];
+        return AlertDialog(
+          title: const Text('Cancel Booking'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Salon: ${booking['salonName']}'),
+              Text('Location: ${booking['location']}'),
+              Text('Services: ${booking['services'].join(', ')}'),
+              Text('Date: ${booking['date']}'),
+              Text('Time: ${booking['timeSlot']}'),
+              Text('Price: ${booking['price']}'),
+              const SizedBox(height: 10),
+              const Text(
+                'Are you sure you want to cancel this booking?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  bookings.removeAt(index);
+                });
+                Navigator.of(context).pop(); // Close dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Booking cancelled successfully')),
+                );
+              },
+              child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,9 +176,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
                               const SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: () {
-                                  setState(() {
-                                    bookings.removeAt(index);
-                                  });
+                                  _showCancelConfirmation(index);
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
