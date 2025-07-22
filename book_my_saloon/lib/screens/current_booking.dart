@@ -183,7 +183,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: const Color.fromARGB(255, 250, 250, 250),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 child: const Text('Reschedule'),
