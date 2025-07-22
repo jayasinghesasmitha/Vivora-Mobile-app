@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('VIVORA', style: AppStyles.appBarStyle),
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         elevation: 0,
         actions: [
           IconButton(
