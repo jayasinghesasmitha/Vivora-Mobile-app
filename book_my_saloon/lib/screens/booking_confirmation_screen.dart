@@ -92,6 +92,7 @@ class BookingConfirmationScreen extends StatelessWidget {
 
             // Salon Info Card
             Card(
+              color: const Color.fromARGB(255, 209, 209, 209),
               elevation: 3,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -167,6 +168,7 @@ class BookingConfirmationScreen extends StatelessWidget {
 
             // Booking Details Card
             Card(
+              color: const Color.fromARGB(255, 212, 212, 212),
               elevation: 3,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
