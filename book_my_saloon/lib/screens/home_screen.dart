@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latLng;
-import 'package:book_my_saloon/utils/colors.dart';
 import 'package:book_my_saloon/utils/styles.dart';
 import 'package:book_my_saloon/widgets/saloon_card.dart';
 import 'package:book_my_saloon/screens/salon_profile.dart';
@@ -121,12 +120,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('VIVORA', style: AppStyles.appBarStyle),
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        title: Text('VIVORA', style: AppStyles.appBarStyle.copyWith(color: Colors.black)),
+        backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.black),
             onPressed: () {
               // Implement logout functionality
             },
@@ -134,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Colors.black))
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -143,14 +142,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Search a Salon...',
+                      hintStyle: const TextStyle(color: Colors.black54), // Ash variant
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.black54), // Ash variant
                       ),
+                      filled: true,
+                      fillColor: Colors.grey[200], // Light ash
                     ),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    flex: 1, // Reduced height of the map
+                    flex: 1,
                     child: FlutterMap(
                       options: MapOptions(
                         center: _currentLocation ?? latLng.LatLng(6.9271, 79.8612),
@@ -169,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 point: _currentLocation!,
                                 child: const Icon(
                                   Icons.my_location,
-                                  color: Colors.blue,
+                                  color: Colors.black,
                                   size: 30.0,
                                 ),
                               ),
@@ -186,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     child: const Icon(
                                       Icons.location_on,
-                                      color: Colors.red,
+                                      color: Colors.red, // Red for salon markers
                                       size: 30.0,
                                     ),
                                   ),
@@ -199,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'Nearby Saloons',
-                    style: AppStyles.sectionHeadingStyle,
+                    style: AppStyles.sectionHeadingStyle.copyWith(color: Colors.black),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -220,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
+                          cardColor: Colors.grey[500], // Explicitly set to ash
                         );
                       },
                     ),
@@ -229,10 +233,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'My Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.book, color: Colors.black), label: 'My Bookings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person, color: Colors.black), label: 'Profile'),
         ],
+        currentIndex: 0, // Highlight the Home icon
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey[500], // Ash for unselected items
+        backgroundColor: Colors.white,
         onTap: (index) {
           switch (index) {
             case 0:
