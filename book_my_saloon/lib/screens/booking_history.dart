@@ -49,16 +49,21 @@ class _BookingHistoryState extends State<BookingHistory> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Unrated Bookings'),
-            content: Text('You have $unratedCount unrated booking(s). Please rate them!'),
+            title: const Text('Unrated Bookings', style: TextStyle(color: Colors.black)),
+            content: Text('You have $unratedCount unrated booking(s). Please rate them!', style: TextStyle(color: Colors.black)),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.grey[200], // Ash variant
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('OK', style: TextStyle(color: Colors.black)),
               ),
             ],
+            backgroundColor: Colors.white,
           );
         },
       );
@@ -82,7 +87,7 @@ class _BookingHistoryState extends State<BookingHistory> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('VIVORA', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
@@ -96,7 +101,7 @@ class _BookingHistoryState extends State<BookingHistory> {
           children: [
             const Text(
               'Booking History',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -105,6 +110,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                 itemBuilder: (context, index) {
                   final booking = bookings[index];
                   return Card(
+                    color: Colors.grey[200], // Ash variant for block background
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -121,7 +127,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                                     height: 50,
                                     width: 50,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error, color: Colors.red);
+                                      return Icon(Icons.error, color: Colors.red); // Keep red for error
                                     },
                                   ),
                                   const SizedBox(width: 10),
@@ -130,12 +136,12 @@ class _BookingHistoryState extends State<BookingHistory> {
                                     children: [
                                       Text(
                                         '${booking['salonName']} • ${booking['location']}',
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                       ),
                                       const SizedBox(height: 4),
                                       ...booking['services'].map<Widget>((service) => Text(
                                             service,
-                                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                            style: const TextStyle(fontSize: 14, color: Colors.black54), // Ash variant
                                           )),
                                     ],
                                   ),
@@ -143,19 +149,19 @@ class _BookingHistoryState extends State<BookingHistory> {
                               ),
                               Text(
                                 booking['price'],
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
                           Text(
                             booking['date'],
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             booking['timeSlot'],
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           const SizedBox(height: 16),
                           Row(
@@ -163,7 +169,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                             children: [
                               const Text(
                                 'Rate Us: ',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                               if (!booking['isRated']) ...[
                                 Row(
@@ -176,7 +182,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                                         Icons.star,
                                         color: starIndex < booking['rating']
                                             ? Colors.amber
-                                            : Colors.grey[400],
+                                            : Colors.grey[400], // Ash variant for unselected stars
                                         size: 24,
                                       ),
                                     );
@@ -190,12 +196,12 @@ class _BookingHistoryState extends State<BookingHistory> {
                                         }
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                                    backgroundColor: Colors.white, // White background for "Rate" button
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Rate'),
+                                  child: const Text('Rate', style: TextStyle(color: Colors.black)),
                                 ),
                               ] else ...[
                                 Row(
@@ -204,7 +210,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                                       Icons.star,
                                       color: starIndex < booking['rating']
                                           ? Colors.amber
-                                          : Colors.grey[400],
+                                          : Colors.grey[400], // Ash variant for unselected stars
                                       size: 24,
                                     );
                                   }),
@@ -215,7 +221,7 @@ class _BookingHistoryState extends State<BookingHistory> {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.teal,
+                                    color: Colors.black, // Changed from teal to black
                                   ),
                                 ),
                               ],
@@ -233,10 +239,11 @@ class _BookingHistoryState extends State<BookingHistory> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'My Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.book, color: Colors.black), label: 'My Bookings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person, color: Colors.black), label: 'Profile'),
         ],
+        backgroundColor: Colors.white,
         onTap: (index) {
           switch (index) {
             case 0:
