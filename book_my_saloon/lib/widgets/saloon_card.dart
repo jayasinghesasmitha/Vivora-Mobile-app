@@ -11,12 +11,13 @@ class SaloonCard extends StatelessWidget {
     required this.address,
     required this.hours,
     required this.onTap,
-    Key? key,
+    Key? key, Color? cardColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.grey[200],
       child: ListTile(
         leading: CircleAvatar(
           // Replace with a local asset or remove NetworkImage
