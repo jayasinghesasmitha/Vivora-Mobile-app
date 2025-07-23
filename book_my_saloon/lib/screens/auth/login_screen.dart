@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
             saloonName: "VIVORA Salon", // Placeholder saloon name
             service: "Haircut", // Placeholder service
             date: DateTime(2024, 6, 19), // Placeholder date as DateTime
-            time: TimeOfDay(hour: 10, minute: 0), 
+            time: TimeOfDay(hour: 10, minute: 0),
             selectedEmployee: "John Doe", // Placeholder employee
             selectedTimeSlots: ['10:00', '11:00'], // Placeholder time slots
           ),
@@ -86,7 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         // Placeholder for Google login implementation
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Google login not implemented yet')),
+                          SnackBar(
+                            content: Text('Google login not implemented yet'),
+                          ),
                         );
                       },
                       icon: Image.network(
@@ -97,7 +99,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       label: Text('Continue with Google'),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black, backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.white,
                         side: BorderSide(color: Colors.grey),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -143,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: _isLoading
                         ? CircularProgressIndicator(color: Colors.white)
-                        : Text('Login'),
+                        : Text('Login', style: TextStyle(color: Colors.black)),
                   ),
                   SizedBox(height: 10),
                   TextButton(
@@ -153,7 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         MaterialPageRoute(builder: (context) => SignupScreen()),
                       );
                     },
-                    child: Text('Not registered yet, then register',
+                    child: Text(
+                      'Not registered yet, then register',
                       style: TextStyle(
                         color: const Color.fromARGB(255, 0, 0, 0),
                         fontSize: 16,
