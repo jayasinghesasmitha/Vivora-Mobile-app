@@ -80,6 +80,9 @@ class _UserProfileState extends State<UserProfile> {
               ),
               const Spacer(),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 200, 200, 200),
+                ),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     // Save changes logic here
@@ -88,7 +91,7 @@ class _UserProfileState extends State<UserProfile> {
                     );
                   }
                 },
-                child: const Text('Save Changes'),
+                child: const Text('Save Changes', style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -100,6 +103,7 @@ class _UserProfileState extends State<UserProfile> {
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'My Bookings'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
+        backgroundColor: Colors.white,
         currentIndex: 2, // Highlight the Profile icon
         selectedItemColor: Colors.black, // Highlighted icon color
         onTap: (index) {
