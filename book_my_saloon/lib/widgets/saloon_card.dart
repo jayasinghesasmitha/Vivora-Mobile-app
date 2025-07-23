@@ -20,6 +20,7 @@ class SaloonCard extends StatelessWidget {
       color: Colors.grey[200],
       child: ListTile(
         leading: CircleAvatar(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           // Replace with a local asset or remove NetworkImage
           child: Icon(Icons.store, color: Colors.grey), // Temporary fallback
           // Alternatively, add an asset: Ensure assets are defined in pubspec.yaml
