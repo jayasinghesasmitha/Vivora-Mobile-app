@@ -40,7 +40,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: const Text(
             'Cancel Booking',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             textAlign: TextAlign.center,
           ),
           content: Container(
@@ -51,7 +51,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
               children: [
                 const Text(
                   'Cancelling this booking delete all data regarding your booking and this process is irreversible.',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -64,11 +64,11 @@ class _CurrentBookingState extends State<CurrentBooking> {
               },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                backgroundColor: Colors.grey[200],
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                backgroundColor: Colors.grey[200], // Ash variant
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('CANCEL'),
+              child: const Text('CANCEL', style: TextStyle(color: Colors.black)),
             ),
             TextButton(
               onPressed: () {
@@ -77,19 +77,20 @@ class _CurrentBookingState extends State<CurrentBooking> {
                 });
                 Navigator.of(context).pop(); // Close dialog
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Booking cancelled successfully')),
+                  const SnackBar(content: Text('Booking cancelled successfully', style: TextStyle(color: Colors.black))),
                 );
               },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                backgroundColor: Colors.red[400],
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                backgroundColor: Colors.red[400], // Keep red for delete
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('DELETE', style: TextStyle(color: Colors.white)),
+              child: const Text('DELETE', style: TextStyle(color: Colors.black)),
             ),
           ],
           actionsAlignment: MainAxisAlignment.spaceEvenly,
+          backgroundColor: Colors.white,
         );
       },
     );
@@ -110,7 +111,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
           children: [
             const Text(
               'Ongoing Bookings',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -119,6 +120,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
                 itemBuilder: (context, index) {
                   final booking = bookings[index];
                   return Card(
+                    color: const Color.fromARGB(255, 221, 220, 220),
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -135,7 +137,7 @@ class _CurrentBookingState extends State<CurrentBooking> {
                                     height: 50,
                                     width: 50,
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error, color: Colors.red);
+                                      return Icon(Icons.error, color: Colors.black);
                                     },
                                   ),
                                   const SizedBox(width: 10),
@@ -144,12 +146,12 @@ class _CurrentBookingState extends State<CurrentBooking> {
                                     children: [
                                       Text(
                                         '${booking['salonName']} • ${booking['location']}',
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                                       ),
                                       const SizedBox(height: 4),
                                       ...booking['services'].map<Widget>((service) => Text(
                                             service,
-                                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                            style: const TextStyle(fontSize: 14, color: Colors.black54), // Ash variant
                                           )),
                                     ],
                                   ),
@@ -157,19 +159,19 @@ class _CurrentBookingState extends State<CurrentBooking> {
                               ),
                               Text(
                                 booking['price'],
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
                           Text(
                             booking['date'],
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             booking['timeSlot'],
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                           const SizedBox(height: 16),
                           Row(
@@ -183,10 +185,10 @@ class _CurrentBookingState extends State<CurrentBooking> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+                                  backgroundColor: Colors.grey[200], // Ash variant
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
-                                child: const Text('Reschedule'),
+                                child: const Text('Reschedule', style: TextStyle(color: Colors.black)),
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton(
@@ -194,10 +196,10 @@ class _CurrentBookingState extends State<CurrentBooking> {
                                   _showCancelConfirmation(index);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: Colors.red, // Keep red for cancel
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
-                                child: const Text('Cancel'),
+                                child: const Text('Cancel', style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -219,7 +221,11 @@ class _CurrentBookingState extends State<CurrentBooking> {
                       MaterialPageRoute(builder: (context) => BookingHistory()),
                     );
                   },
-                  child: const Text('View Booking History'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200], // Ash variant
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('View Booking History', style: TextStyle(color: Colors.black)),
                 ),
               ),
             ),
@@ -228,12 +234,14 @@ class _CurrentBookingState extends State<CurrentBooking> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'My Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.book, color: Colors.black), label: 'My Bookings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person, color: Colors.black), label: 'Profile'),
         ],
         currentIndex: 1, // Highlight the My Bookings icon
-        selectedItemColor: Colors.black, // Highlighted icon color
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey[500], // Ash for unselected items
+        backgroundColor: Colors.white,
         onTap: (index) {
           switch (index) {
             case 0:
