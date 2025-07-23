@@ -126,7 +126,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     child: _isLoading
                         ? CircularProgressIndicator(color: Colors.white)
-                        : Text('Register'),
+                        : Text('Register', style: TextStyle(color: Colors.black)),
                   ),
                 ],
               ),
