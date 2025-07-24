@@ -12,31 +12,43 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scissorAnimation;
-  late Animation<Offset> _vivoraSlideAnimation;
-  late Animation<Offset> _subtitleSlideAnimation;
+  late Animation<double> _bladeAnimation;
+  late Animation<double> _textFadeAnimation;
+  late Animation<Offset> _textSlideAnimation;
+  late Animation<double> _textScaleAnimation;
+  late Animation<Offset> _creatorSlideAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 2), // Reduced to 2 seconds
     );
 
-    // Scissor animation (simulating cutting motion)
-    _scissorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.1, 0.5, curve: Curves.easeInOutCubic)),
+    // Blade animation (realistic cutting motion)
+    _bladeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.1, 0.7, curve: Curves.easeInOutCubic)),
     );
 
-    // Slide animation for VIVORA (cutting motion effect)
-    _vivoraSlideAnimation = Tween<Offset>(begin: const Offset(-2.0, 0.0), end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.2, 0.6, curve: Curves.easeOutBack)),
+    // Fade-in animation for text
+    _textFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 0.9, curve: Curves.easeInOut)),
     );
 
-    // Slide animation for subtitle with bounce
-    _subtitleSlideAnimation = Tween<Offset>(begin: const Offset(0.0, 2.0), end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: Interval(0.6, 1.0, curve: Curves.bounceOut)),
+    // Slide animation for "Book My Salon"
+    _textSlideAnimation = Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.6, 0.9, curve: Curves.easeOutBack)),
+    );
+
+    // Scale animation for "Book My Salon"
+    _textScaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.7, 0.9, curve: Curves.easeOut)),
+    );
+
+    // Slide animation for "Created by VIVORA Solutions"
+    _creatorSlideAnimation = Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.7, 1.0, curve: Curves.easeOut)),
     );
 
     _controller.addListener(() {
@@ -44,8 +56,8 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
     });
     _controller.forward();
 
-    // Navigate to home screen after 5 seconds
-    Timer(const Duration(seconds: 5), () {
+    // Navigate to home screen after 2 seconds
+    Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -65,7 +77,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4A2C2A), Color(0xFFF5E6CC)], // Warm salon tones (brown to beige)
+            colors: [Color.fromARGB(255, 192, 191, 191), Colors.white], // Ash to white gradient
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -77,45 +89,55 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Scissor animation (custom painted effect)
+                  // Blade animation (stylized cutting effect)
                   CustomPaint(
-                    painter: ScissorPainter(progress: _scissorAnimation.value),
+                    painter: BladePainter(progress: _bladeAnimation.value),
                     child: const SizedBox(
                       width: 200,
                       height: 200,
                     ),
                   ),
-                  // VIVORA with slide animation
+                  // "Book My Salon" with fade, slide, and scale animations
                   SlideTransition(
-                    position: _vivoraSlideAnimation,
-                    child: Text(
-                      'VIVORA',
-                      style: TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: const Offset(2.0, 2.0),
-                            blurRadius: 4.0,
+                    position: _textSlideAnimation,
+                    child: ScaleTransition(
+                      scale: _textScaleAnimation,
+                      child: FadeTransition(
+                        opacity: _textFadeAnimation,
+                        child: Text(
+                          'Book My Salon',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black26,
+                                offset: const Offset(2.0, 2.0),
+                                blurRadius: 4.0,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                  // Subtitle with slide animation
-                  Padding(
-                    padding: const EdgeInsets.only(top: 80),
+                  // "Created by VIVORA Solutions" at bottom right
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
                     child: SlideTransition(
-                      position: _subtitleSlideAnimation,
-                      child: Text(
-                        'VIVORA Solutions presents Book My Salon',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                      position: _creatorSlideAnimation,
+                      child: FadeTransition(
+                        opacity: _textFadeAnimation,
+                        child: Text(
+                          'Created by VIVORA Solutions',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black54, // Ash variant
+                          ),
                         ),
                       ),
                     ),
@@ -130,35 +152,44 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   }
 }
 
-// Custom painter for scissor-like animation
-class ScissorPainter extends CustomPainter {
+// Custom painter for blade-like animation
+class BladePainter extends CustomPainter {
   final double progress;
 
-  ScissorPainter({required this.progress});
+  BladePainter({required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.8)
+      ..color = Colors.black.withOpacity(0.9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4.0;
+      ..strokeWidth = 6.0;
 
     final path = Path();
     final center = Offset(size.width / 2, size.height / 2);
 
-    // Simulate scissor blades crossing
-    final angle = math.pi * progress; // Progress controls the angle
-    final bladeLength = size.width * 0.4;
+    // Realistic blade motion with a slight curve
+    final angle = math.pi * progress * 0.5; // Controlled angle for smoother motion
+    final bladeLength = size.width * 0.35;
+    final curveOffset = size.width * 0.1 * math.sin(progress * math.pi);
 
     // Left blade
     path.moveTo(center.dx - bladeLength * math.cos(angle), center.dy - bladeLength * math.sin(angle));
-    path.lineTo(center.dx, center.dy);
-    path.lineTo(center.dx - bladeLength * math.cos(angle + math.pi / 6), center.dy - bladeLength * math.sin(angle + math.pi / 6));
+    path.quadraticBezierTo(
+      center.dx - curveOffset,
+      center.dy - curveOffset,
+      center.dx,
+      center.dy,
+    );
 
     // Right blade
     path.moveTo(center.dx + bladeLength * math.cos(angle), center.dy + bladeLength * math.sin(angle));
-    path.lineTo(center.dx, center.dy);
-    path.lineTo(center.dx + bladeLength * math.cos(angle + math.pi / 6), center.dy + bladeLength * math.sin(angle + math.pi / 6));
+    path.quadraticBezierTo(
+      center.dx + curveOffset,
+      center.dy + curveOffset,
+      center.dx,
+      center.dy,
+    );
 
     canvas.drawPath(path, paint);
   }
