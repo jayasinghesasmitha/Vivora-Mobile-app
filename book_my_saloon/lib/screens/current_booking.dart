@@ -35,7 +35,6 @@ class _CurrentBookingState extends State<CurrentBooking> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final booking = bookings[index];
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: const Text(
