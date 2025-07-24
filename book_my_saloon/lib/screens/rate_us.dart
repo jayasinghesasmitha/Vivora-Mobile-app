@@ -86,7 +86,7 @@ class _RateUsState extends State<RateUs> {
             ElevatedButton(
               onPressed: _rating > 0 ? _submitRating : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: const Color.fromARGB(255, 216, 216, 216),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -94,7 +94,7 @@ class _RateUsState extends State<RateUs> {
               ),
               child: const Text(
                 'SUBMIT',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.black),
               ),
             ),
           ],
