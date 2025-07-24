@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:book_my_saloon/screens/home_screen.dart';
+import 'package:book_my_saloon/screens/rate_us.dart'; // Assuming Rate_us.dart is renamed to rate_us.dart
 
-class BookingConfirmationScreen extends StatelessWidget {
+class BookingConfirmationScreen extends StatefulWidget {
   final String saloonName;
-  final String
-  service; // This should be a comma-separated string of selected services
+  final String service; // This should be a comma-separated string of selected services
   final DateTime date;
   final TimeOfDay time;
   final String selectedEmployee; // Add employee parameter
@@ -22,9 +22,28 @@ class BookingConfirmationScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _BookingConfirmationScreenState createState() => _BookingConfirmationScreenState();
+}
+
+class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Navigate to Rate_us.dart after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RateUs()), // Adjust the import and widget name as needed
+        );
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Parse selected services
-    final List<String> selectedServices = service.split(', ');
+    final List<String> selectedServices = widget.service.split(', ');
 
     // Service details (should match salon_profile.dart)
     final Map<String, double> servicePrices = {
@@ -50,10 +69,10 @@ class BookingConfirmationScreen extends StatelessWidget {
     );
 
     // Format date and time
-    final formattedDate = DateFormat('EEEE, MMMM d, y').format(date);
-    final startTime = '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+    final formattedDate = DateFormat('EEEE, MMMM d, y').format(widget.date);
+    final startTime = '${widget.time.hour}:${widget.time.minute.toString().padLeft(2, '0')}';
     final endTime =
-        '${time.hour + (time.minute + totalDuration) ~/ 60}:${(time.minute + totalDuration) % 60}'
+        '${widget.time.hour + (widget.time.minute + totalDuration) ~/ 60}:${(widget.time.minute + totalDuration) % 60}'
             .padLeft(2, '0');
 
     return Scaffold(
@@ -116,7 +135,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                saloonName,
+                                widget.saloonName,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -185,7 +204,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                     SizedBox(height: 16),
 
                     // Employee
-                    _buildDetailRow('Employee', selectedEmployee),
+                    _buildDetailRow('Employee', widget.selectedEmployee),
                     SizedBox(height: 8),
 
                     // Date
@@ -233,7 +252,7 @@ class BookingConfirmationScreen extends StatelessWidget {
 
             // Action Buttons
             Column(
-              children: [ 
+              children: [
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
