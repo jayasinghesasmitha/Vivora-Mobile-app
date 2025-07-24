@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:book_my_saloon/screens/home_screen.dart';
 import 'package:book_my_saloon/screens/current_booking.dart';
-import 'package:book_my_saloon/screens/user_profile.dart';
 
 class BookingHistory extends StatefulWidget {
   const BookingHistory({Key? key}) : super(key: key);
@@ -234,38 +232,27 @@ class _BookingHistoryState extends State<BookingHistory> {
                 },
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => CurrentBooking()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200], // Ash variant
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Back to Bookings', style: TextStyle(color: Colors.black)),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home, color: Colors.black), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.book, color: Colors.black), label: 'My Bookings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person, color: Colors.black), label: 'Profile'),
-        ],
-        backgroundColor: Colors.white,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
-              break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => CurrentBooking()),
-              );
-              break;
-            case 2:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => UserProfile()),
-              );
-              break;
-          }
-        },
       ),
     );
   }
