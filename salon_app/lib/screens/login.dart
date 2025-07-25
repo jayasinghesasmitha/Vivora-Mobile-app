@@ -95,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const SignupScreen()),
                   );
                 },
-                child: const Text('Register', style: TextStyle(color: Colors.black54)),
+                child: const Text('Not yet Registered? Then register first', style: TextStyle(color: Colors.black54)),
               ),
             ),
           ],
