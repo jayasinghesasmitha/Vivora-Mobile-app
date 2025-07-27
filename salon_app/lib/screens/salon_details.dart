@@ -36,6 +36,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Edit $field', style: const TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
         content: TextField(
           controller: controller,
           maxLines: field == 'Description' ? 3 : 1,
@@ -45,7 +46,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               borderSide: BorderSide(color: Colors.black54),
             ),
             filled: true,
-            fillColor: Colors.grey[200],
+            fillColor: Colors.white,
           ),
         ),
         actions: [
@@ -53,6 +54,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
             child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
           ),
           ElevatedButton(
@@ -61,7 +63,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('Save', style: TextStyle(color: Colors.black)),
@@ -83,6 +85,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Edit Time', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -113,7 +116,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                       if (tempStartHour == 0) tempStartHour = 12;
                     });
                   },
-                  dropdownColor: Colors.grey[200],
+                  dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
                 const SizedBox(width: 2),
@@ -133,7 +136,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                       if (tempStartHour == 24) tempStartHour = 12;
                     });
                   },
-                  dropdownColor: Colors.grey[200],
+                  dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
                 const Text(' - ', style: TextStyle(color: Colors.black)),
@@ -162,7 +165,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                       if (tempEndHour == 0) tempEndHour = 12;
                     });
                   },
-                  dropdownColor: Colors.grey[200],
+                  dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
                 const SizedBox(width: 2),
@@ -182,7 +185,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                       if (tempEndHour == 24) tempEndHour = 12;
                     });
                   },
-                  dropdownColor: Colors.grey[200],
+                  dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
               ],
@@ -194,6 +197,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
             child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
           ),
           ElevatedButton(
@@ -202,7 +206,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('Save', style: TextStyle(color: Colors.black)),
@@ -214,12 +218,6 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
 
   void _applyGlobalTime() {
     setState(() {
-      _globalStartHour = 8;
-      _globalStartMin = 0;
-      _globalStartPeriod = 'AM';
-      _globalEndHour = 9;
-      _globalEndMin = 0;
-      _globalEndPeriod = 'PM';
       for (var day in _openingDays) {
         if (day['checked']) {
           day['startHour'] = _globalStartHour;
@@ -265,7 +263,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   height: 100,
                   width: 100,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: Colors.white,
                     border: Border.all(color: Colors.black54),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
@@ -316,7 +314,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.grey[300]!, blurRadius: 4, offset: const Offset(0, 2)),
                 ],
@@ -330,14 +328,17 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Opening Hours',
-                        style: TextStyle(color: Colors.black54, fontSize: 14),
+                      const Expanded(
+                        child: Text(
+                          'Opening Hours',
+                          style: TextStyle(color: Colors.black54, fontSize: 14),
+                        ),
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
                             '${_globalStartHour.toString().padLeft(2, '0')}:${_globalStartMin.toString().padLeft(2, '0')} $_globalStartPeriod - '
@@ -371,14 +372,14 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       SizedBox(
                         width: 50,
                         child: ElevatedButton(
                           onPressed: _applyGlobalTime,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[200],
+                            backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                             padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                           ),
@@ -469,7 +470,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 26, 2025, 10:43 AM +0530',
+                    'Current Date & Time: July 27, 2025, 09:03 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -481,7 +482,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                           setState(() {});
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text('Save', style: TextStyle(color: Colors.black)),
@@ -492,7 +493,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                           setState(() {});
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: const Text('Update', style: TextStyle(color: Colors.black)),
@@ -509,7 +510,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.grey[300]!, blurRadius: 4, offset: const Offset(0, 2)),
                 ],
@@ -531,7 +532,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                               height: 80,
                               width: 80,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: Colors.white,
                                 border: Border.all(color: Colors.black54),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -547,7 +548,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                             height: 80,
                             width: 80,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: Colors.white,
                               border: Border.all(color: Colors.black54),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -567,7 +568,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.grey[300]!, blurRadius: 4, offset: const Offset(0, 2)),
                 ],
@@ -581,6 +582,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   ),
                   const SizedBox(height: 10),
                   ..._services.map((service) => ListTile(
+                        tileColor: Colors.white,
                         title: Text(service, style: const TextStyle(color: Colors.black)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -614,7 +616,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.grey[300]!, blurRadius: 4, offset: const Offset(0, 2)),
                 ],
@@ -628,6 +630,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   ),
                   const SizedBox(height: 10),
                   ..._employees.map((employee) => ListTile(
+                        tileColor: Colors.white,
                         title: Text(employee, style: const TextStyle(color: Colors.black)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -661,7 +664,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black54),
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.grey[300]!, blurRadius: 4, offset: const Offset(0, 2)),
                 ],
@@ -675,6 +678,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   ),
                   const SizedBox(height: 10),
                   ..._workStations.map((station) => ListTile(
+                        tileColor: Colors.white,
                         title: Text(station, style: const TextStyle(color: Colors.black)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -711,7 +715,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Text('Back', style: TextStyle(color: Colors.black)),
