@@ -25,9 +25,14 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
   int _globalEndHour = 9, _globalEndMin = 0;
   String _globalEndPeriod = 'PM'; 
   final List<String> _photos = [];
-  final List<String> _services = ['Haircut', 'Coloring', 'Manicure'];
+  final List<Map<String, dynamic>> _services = [
+    {'service': 'Haircut', 'price': 500, 'time': '1 hr', 'userCategories': ['male', 'female']},
+    {'service': 'Coloring', 'price': 1500, 'time': '2 hrs', 'userCategories': ['female']},
+    {'service': 'Manicure', 'price': 300, 'time': '45 mins', 'userCategories': ['female', 'children']}
+  ];
   final List<String> _employees = ['John Doe - Stylist', 'Jane Smith - Manager'];
   final List<String> _workStations = ['Station 1', 'Station 2'];
+  bool _showPrices = false;
 
   bool _isEditing = false;
 
@@ -235,6 +240,116 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     setState(() {
       _openingDays[index]['isEditing'] = !_openingDays[index]['isEditing'];
     });
+  }
+
+  void _showServiceEditPopup({int? index}) {
+    final TextEditingController _serviceController = TextEditingController(text: index != null ? _services[index]['service'] : '');
+    final TextEditingController _priceController = TextEditingController(text: index != null ? _services[index]['price'].toString() : '');
+    final TextEditingController _timeController = TextEditingController(text: index != null ? _services[index]['time'] : '');
+    List<String> selectedCategories = index != null ? List.from(_services[index]['userCategories']) : [];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(index != null ? 'Edit Service' : 'Add New Service', style: const TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _serviceController,
+              decoration: InputDecoration(labelText: 'Service', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _priceController,
+              decoration: InputDecoration(labelText: 'Price (Rs)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _timeController,
+              decoration: InputDecoration(labelText: 'Time', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+            ),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: 'User Category',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+              value: selectedCategories.isNotEmpty ? selectedCategories[0] : null, // Set initial value
+              items: ['male', 'female', 'children', 'unisex'].map((String category) {
+                return DropdownMenuItem<String>(
+                  value: category,
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: selectedCategories.contains(category),
+                        onChanged: (bool? value) {
+                          setState(() {
+                            if (value == true) {
+                              if (!selectedCategories.contains(category)) selectedCategories.add(category);
+                            } else {
+                              selectedCategories.remove(category);
+                            }
+                          });
+                        },
+                      ),
+                      Text(category),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null && !selectedCategories.contains(newValue)) {
+                  setState(() {
+                    selectedCategories.add(newValue);
+                  });
+                }
+              },
+              dropdownColor: Colors.white,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (index != null) {
+                setState(() {
+                  _services[index] = {
+                    'service': _serviceController.text,
+                    'price': int.tryParse(_priceController.text) ?? 0,
+                    'time': _timeController.text,
+                    'userCategories': selectedCategories,
+                  };
+                });
+              } else {
+                setState(() {
+                  _services.add({
+                    'service': _serviceController.text,
+                    'price': int.tryParse(_priceController.text) ?? 0,
+                    'time': _timeController.text,
+                    'userCategories': selectedCategories,
+                  });
+                });
+              }
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(index != null ? 'Save' : 'Add', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -470,7 +585,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 27, 2025, 09:03 PM +0530',
+                    'Current Date & Time: July 27, 2025, 09:44 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -576,36 +691,101 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Services',
-                    style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                  const Center(
+                    child: Text(
+                      'Services',
+                      style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  ..._services.map((service) => ListTile(
-                        tileColor: Colors.white,
-                        title: Text(service, style: const TextStyle(color: Colors.black)),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.add, color: Colors.black54),
-                              onPressed: () {
-                                setState(() {
-                                  _services.add('New Service');
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.remove, color: Colors.red),
-                              onPressed: () {
-                                setState(() {
-                                  _services.remove(service);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _showPrices,
+                        onChanged: (value) {
+                          setState(() {
+                            _showPrices = value ?? false;
+                          });
+                        },
+                        activeColor: Colors.black,
+                        checkColor: Colors.white,
+                      ),
+                      const Text('Show Prices', style: TextStyle(color: Colors.black54)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Expanded(child: Text('Service', style: TextStyle(fontWeight: FontWeight.bold))),
+                      if (_showPrices) const Expanded(child: Text('Price (Rs)', style: TextStyle(fontWeight: FontWeight.bold))),
+                      const Expanded(child: Text('Time', style: TextStyle(fontWeight: FontWeight.bold))),
+                      const Expanded(child: Text('User Category', style: TextStyle(fontWeight: FontWeight.bold))),
+                      const SizedBox(width: 80), // Space for icons
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ..._services.map((service) => Row(
+                        children: [
+                          Expanded(child: Text(service['service'], style: const TextStyle(color: Colors.black))),
+                          if (_showPrices) Expanded(child: Text(service['price'].toString(), style: const TextStyle(color: Colors.black))),
+                          Expanded(child: Text(service['time'], style: const TextStyle(color: Colors.black))),
+                          Expanded(child: Text(service['userCategories'].join(', '), style: const TextStyle(color: Colors.black))),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.black54),
+                                onPressed: () => _showServiceEditPopup(index: _services.indexOf(service)),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    _services.remove(service);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       )),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () => _showServiceEditPopup(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Add New Service', style: TextStyle(color: Colors.black)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Save', style: TextStyle(color: Colors.black)),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Update', style: TextStyle(color: Colors.black)),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
