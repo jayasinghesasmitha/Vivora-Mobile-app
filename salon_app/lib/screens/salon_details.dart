@@ -34,7 +34,10 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     {'name': 'John Doe - Stylist', 'image': 'images/salon_image.jpg'},
     {'name': 'Jane Smith - Manager', 'image': 'images/salon_image.jpg'}
   ];
-  final List<String> _workStations = ['Station 1', 'Station 2'];
+  final List<Map<String, dynamic>> _workStations = [
+    {'name': 'Station 1', 'description': 'Description for Station 1'},
+    {'name': 'Station 2', 'description': 'Description for Station 2'}
+  ];
   bool _showPrices = false;
 
   bool _isEditing = false;
@@ -493,6 +496,128 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     );
   }
 
+  void _showAddWorkStationPopup() {
+    final TextEditingController _nameController = TextEditingController();
+    final TextEditingController _descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Workstation', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _descriptionController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _workStations.add({
+                  'name': _nameController.text,
+                  'description': _descriptionController.text,
+                });
+              });
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Add', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditWorkStationPopup(int index) {
+    final TextEditingController _nameController = TextEditingController(text: _workStations[index]['name']);
+    final TextEditingController _descriptionController = TextEditingController(text: _workStations[index]['description']);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Workstation', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _descriptionController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _workStations[index] = {
+                  'name': _nameController.text,
+                  'description': _descriptionController.text,
+                };
+              });
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Save', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -726,7 +851,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 27, 2025, 09:53 PM +0530',
+                    'Current Date & Time: July 27, 2025, 10:00 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -1042,36 +1167,88 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Work Stations',
-                    style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                  const Center(
+                    child: Text(
+                      'Workstations',
+                      style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  ..._workStations.map((station) => ListTile(
-                        tileColor: Colors.white,
-                        title: Text(station, style: const TextStyle(color: Colors.black)),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.add, color: Colors.black54),
-                              onPressed: () {
-                                setState(() {
-                                  _workStations.add('New Station');
-                                });
-                              },
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _showAddWorkStationPopup,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Add Workstation', style: TextStyle(color: Colors.black)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ..._workStations.map((station) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            station['name'],
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                          const SizedBox(height: 5),
+                          TextField(
+                            controller: TextEditingController(text: station['description']),
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              filled: true,
+                              fillColor: Colors.white,
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.remove, color: Colors.red),
-                              onPressed: () {
-                                setState(() {
-                                  _workStations.remove(station);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.black54),
+                                onPressed: () => _showEditWorkStationPopup(_workStations.indexOf(station)),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    _workStations.remove(station);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                        ],
                       )),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Save', style: TextStyle(color: Colors.black)),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Update', style: TextStyle(color: Colors.black)),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
