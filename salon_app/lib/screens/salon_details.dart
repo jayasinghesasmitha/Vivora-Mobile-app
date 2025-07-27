@@ -30,7 +30,10 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     {'service': 'Coloring', 'price': 1500, 'time': '2 hrs', 'userCategories': ['female']},
     {'service': 'Manicure', 'price': 300, 'time': '45 mins', 'userCategories': ['female', 'children']}
   ];
-  final List<String> _employees = ['John Doe - Stylist', 'Jane Smith - Manager'];
+  final List<Map<String, dynamic>> _employees = [
+    {'name': 'John Doe - Stylist', 'image': 'images/salon_image.jpg'},
+    {'name': 'Jane Smith - Manager', 'image': 'images/salon_image.jpg'}
+  ];
   final List<String> _workStations = ['Station 1', 'Station 2'];
   bool _showPrices = false;
 
@@ -278,7 +281,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                 filled: true,
                 fillColor: Colors.white,
               ),
-              value: selectedCategories.isNotEmpty ? selectedCategories[0] : null, // Set initial value
+              value: selectedCategories.isNotEmpty ? selectedCategories[0] : null,
               items: ['male', 'female', 'children', 'unisex'].map((String category) {
                 return DropdownMenuItem<String>(
                   value: category,
@@ -346,6 +349,144 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: Text(index != null ? 'Save' : 'Add', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddEmployeePopup() {
+    final TextEditingController _nameController = TextEditingController();
+    String _imagePath = 'images/salon_image.jpg';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add New Employee', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                // Implement image picker logic here if needed
+                setState(() {
+                  _imagePath = 'images/salon_image.jpg'; // Default image for now
+                });
+              },
+              child: Column(
+                children: [
+                  Image.asset(
+                    _imagePath,
+                    height: 50,
+                    width: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error, color: Colors.red);
+                    },
+                  ),
+                  const Text('Tap to change image', style: TextStyle(color: Colors.black54)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _employees.add({'name': _nameController.text, 'image': _imagePath});
+              });
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Add', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditEmployeePopup(int index) {
+    final TextEditingController _nameController = TextEditingController(text: _employees[index]['name']);
+    String _imagePath = _employees[index]['image'];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Employee', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                // Implement image picker logic here if needed
+                setState(() {
+                  _imagePath = 'images/salon_image.jpg'; // Default image for now
+                });
+              },
+              child: Column(
+                children: [
+                  Image.asset(
+                    _imagePath,
+                    height: 50,
+                    width: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error, color: Colors.red);
+                    },
+                  ),
+                  const Text('Tap to change image', style: TextStyle(color: Colors.black54)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _employees[index] = {'name': _nameController.text, 'image': _imagePath};
+              });
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Save', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -585,7 +726,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 27, 2025, 09:44 PM +0530',
+                    'Current Date & Time: July 27, 2025, 09:53 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -804,27 +945,49 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Center(
+                    child: Text(
+                      'Employees',
+                      style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _showAddEmployeePopup,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text('Add New Employee', style: TextStyle(color: Colors.black)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   const Text(
-                    'Employees',
-                    style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    'Available Employees',
+                    style: TextStyle(color: Colors.black54, fontSize: 14),
                   ),
                   const SizedBox(height: 10),
                   ..._employees.map((employee) => ListTile(
                         tileColor: Colors.white,
-                        title: Text(employee, style: const TextStyle(color: Colors.black)),
+                        leading: Image.asset(
+                          employee['image'],
+                          height: 50,
+                          width: 50,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.error, color: Colors.red);
+                          },
+                        ),
+                        title: Text(employee['name'], style: const TextStyle(color: Colors.black)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.add, color: Colors.black54),
-                              onPressed: () {
-                                setState(() {
-                                  _employees.add('New Employee - Role');
-                                });
-                              },
+                              icon: const Icon(Icons.edit, color: Colors.black54),
+                              onPressed: () => _showEditEmployeePopup(_employees.indexOf(employee)),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.remove, color: Colors.red),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () {
                                 setState(() {
                                   _employees.remove(employee);
@@ -834,6 +997,33 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                           ],
                         ),
                       )),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Save', style: TextStyle(color: Colors.black)),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Update', style: TextStyle(color: Colors.black)),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
