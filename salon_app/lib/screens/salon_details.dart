@@ -21,9 +21,9 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     {'day': 'Sunday', 'checked': false, 'startHour': 0, 'startMin': 0, 'startPeriod': 'AM', 'endHour': 0, 'endMin': 0, 'endPeriod': 'AM', 'isEditing': false},
   ];
   int _globalStartHour = 8, _globalStartMin = 0;
-  String _globalStartPeriod = 'AM'; 
+  String _globalStartPeriod = 'AM';
   int _globalEndHour = 9, _globalEndMin = 0;
-  String _globalEndPeriod = 'PM'; 
+  String _globalEndPeriod = 'PM';
   final List<String> _photos = [];
   final List<Map<String, dynamic>> _services = [
     {'service': 'Haircut', 'price': 500, 'time': '1 hr', 'userCategories': ['male', 'female']},
@@ -31,8 +31,8 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     {'service': 'Manicure', 'price': 300, 'time': '45 mins', 'userCategories': ['female', 'children']}
   ];
   final List<Map<String, dynamic>> _employees = [
-    {'name': 'John Doe - Stylist', 'image': 'images/salon_image.jpg'},
-    {'name': 'Jane Smith - Manager', 'image': 'images/salon_image.jpg'}
+    {'name': 'John Doe - Stylist', 'image': 'images/salon_image.jpg', 'contact': '1234567890', 'email': 'john@example.com', 'bio': 'Experienced stylist', 'services': ['Haircut', 'Coloring']},
+    {'name': 'Jane Smith - Manager', 'image': 'images/salon_image.jpg', 'contact': '0987654321', 'email': 'jane@example.com', 'bio': 'Dedicated manager', 'services': ['Manicure']}
   ];
   final List<Map<String, dynamic>> _workStations = [
     {'name': 'Station 1', 'description': 'Description for Station 1'},
@@ -259,160 +259,244 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
       builder: (context) => AlertDialog(
         title: Text(index != null ? 'Edit Service' : 'Add New Service', style: const TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _serviceController,
-              decoration: InputDecoration(labelText: 'Service', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _priceController,
-              decoration: InputDecoration(labelText: 'Price (Rs)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _timeController,
-              decoration: InputDecoration(labelText: 'Time', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-            ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: 'User Category',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-              value: selectedCategories.isNotEmpty ? selectedCategories[0] : null,
-              items: ['male', 'female', 'children', 'unisex'].map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Row(
-                    children: [
-                      Checkbox(
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _serviceController,
+                    decoration: InputDecoration(
+                      labelText: 'Service',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _priceController,
+                    decoration: InputDecoration(
+                      labelText: 'Price (Rs)',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _timeController,
+                    decoration: InputDecoration(
+                      labelText: 'Time',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('User Category', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ...['male', 'female', 'children', 'unisex'].map((category) => CheckboxListTile(
+                        title: Text(category),
                         value: selectedCategories.contains(category),
                         onChanged: (bool? value) {
-                          setState(() {
+                          setDialogState(() {
                             if (value == true) {
-                              if (!selectedCategories.contains(category)) selectedCategories.add(category);
+                              if (!selectedCategories.contains(category)) {
+                                selectedCategories.add(category);
+                              }
                             } else {
                               selectedCategories.remove(category);
                             }
                           });
                         },
-                      ),
-                      Text(category),
-                    ],
-                  ),
+                        activeColor: Colors.black,
+                        checkColor: Colors.white,
+                      )),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_serviceController.text.isNotEmpty &&
+                  _priceController.text.isNotEmpty &&
+                  _timeController.text.isNotEmpty &&
+                  selectedCategories.isNotEmpty) {
+                setState(() {
+                  if (index != null) {
+                    _services[index] = {
+                      'service': _serviceController.text,
+                      'price': int.tryParse(_priceController.text) ?? 0,
+                      'time': _timeController.text,
+                      'userCategories': selectedCategories,
+                    };
+                  } else {
+                    _services.add({
+                      'service': _serviceController.text,
+                      'price': int.tryParse(_priceController.text) ?? 0,
+                      'time': _timeController.text,
+                      'userCategories': selectedCategories,
+                    });
+                  }
+                });
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please fill all fields and select at least one category')),
                 );
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null && !selectedCategories.contains(newValue)) {
-                  setState(() {
-                    selectedCategories.add(newValue);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(index != null ? 'Save' : 'Add', style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEmployeePopup({int? index}) {
+    final TextEditingController _nameController = TextEditingController(text: index != null ? _employees[index]['name'] : '');
+    final TextEditingController _contactController = TextEditingController(text: index != null ? _employees[index]['contact'] : '');
+    final TextEditingController _emailController = TextEditingController(text: index != null ? _employees[index]['email'] : '');
+    final TextEditingController _bioController = TextEditingController(text: index != null ? _employees[index]['bio'] : '');
+    String _imagePath = index != null ? _employees[index]['image'] : 'images/salon_image.jpg';
+    List<String> selectedServices = index != null ? List.from(_employees[index]['services']) : [];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(index != null ? 'Edit Employee' : 'Add New Employee', style: const TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setDialogState(() {
+                        _imagePath = 'images/salon_image.jpg';
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          _imagePath,
+                          height: 100,
+                          width: 100,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.error, color: Colors.red);
+                          },
+                        ),
+                        const Text('Tap to change image', style: TextStyle(color: Colors.black54)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _contactController,
+                    decoration: InputDecoration(
+                      labelText: 'Contact Number',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _bioController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Bio',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text('Services', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ..._services.map((service) => CheckboxListTile(
+                        title: Text(service['service']),
+                        value: selectedServices.contains(service['service']),
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            if (value == true) {
+                              if (!selectedServices.contains(service['service'])) {
+                                selectedServices.add(service['service']);
+                              }
+                            } else {
+                              selectedServices.remove(service['service']);
+                            }
+                          });
+                        },
+                        activeColor: Colors.black,
+                        checkColor: Colors.white,
+                      )),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(backgroundColor: Colors.white),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                if (index != null) {
+                  _employees[index] = {
+                    'name': _nameController.text,
+                    'image': _imagePath,
+                    'contact': _contactController.text,
+                    'email': _emailController.text,
+                    'bio': _bioController.text,
+                    'services': selectedServices,
+                  };
+                } else {
+                  _employees.add({
+                    'name': _nameController.text,
+                    'image': _imagePath,
+                    'contact': _contactController.text,
+                    'email': _emailController.text,
+                    'bio': _bioController.text,
+                    'services': selectedServices,
                   });
                 }
-              },
-              dropdownColor: Colors.white,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(backgroundColor: Colors.white),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (index != null) {
-                setState(() {
-                  _services[index] = {
-                    'service': _serviceController.text,
-                    'price': int.tryParse(_priceController.text) ?? 0,
-                    'time': _timeController.text,
-                    'userCategories': selectedCategories,
-                  };
-                });
-              } else {
-                setState(() {
-                  _services.add({
-                    'service': _serviceController.text,
-                    'price': int.tryParse(_priceController.text) ?? 0,
-                    'time': _timeController.text,
-                    'userCategories': selectedCategories,
-                  });
-                });
-              }
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: Text(index != null ? 'Save' : 'Add', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddEmployeePopup() {
-    final TextEditingController _nameController = TextEditingController();
-    String _imagePath = 'images/salon_image.jpg';
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Employee', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                // Implement image picker logic here if needed
-                setState(() {
-                  _imagePath = 'images/salon_image.jpg'; // Default image for now
-                });
-              },
-              child: Column(
-                children: [
-                  Image.asset(
-                    _imagePath,
-                    height: 50,
-                    width: 50,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.error, color: Colors.red);
-                    },
-                  ),
-                  const Text('Tap to change image', style: TextStyle(color: Colors.black54)),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(backgroundColor: Colors.white),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _employees.add({'name': _nameController.text, 'image': _imagePath});
               });
               Navigator.pop(context);
             },
@@ -420,76 +504,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Add', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditEmployeePopup(int index) {
-    final TextEditingController _nameController = TextEditingController(text: _employees[index]['name']);
-    String _imagePath = _employees[index]['image'];
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Employee', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                // Implement image picker logic here if needed
-                setState(() {
-                  _imagePath = 'images/salon_image.jpg'; // Default image for now
-                });
-              },
-              child: Column(
-                children: [
-                  Image.asset(
-                    _imagePath,
-                    height: 50,
-                    width: 50,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.error, color: Colors.red);
-                    },
-                  ),
-                  const Text('Tap to change image', style: TextStyle(color: Colors.black54)),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(backgroundColor: Colors.white),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _employees[index] = {'name': _nameController.text, 'image': _imagePath};
-              });
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Save', style: TextStyle(color: Colors.black)),
+            child: Text(index != null ? 'Save and Update' : 'Add', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -851,7 +866,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 27, 2025, 10:00 PM +0530',
+                    'Current Date & Time: July 28, 2025, 09:03 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -1079,7 +1094,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   const SizedBox(height: 10),
                   Center(
                     child: ElevatedButton(
-                      onPressed: _showAddEmployeePopup,
+                      onPressed: () => _showEmployeePopup(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -1104,12 +1119,13 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                           },
                         ),
                         title: Text(employee['name'], style: const TextStyle(color: Colors.black)),
+                        subtitle: Text('${employee['contact']} | ${employee['email']}', style: const TextStyle(color: Colors.black54)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit, color: Colors.black54),
-                              onPressed: () => _showEditEmployeePopup(_employees.indexOf(employee)),
+                              onPressed: () => _showEmployeePopup(index: _employees.indexOf(employee)),
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
