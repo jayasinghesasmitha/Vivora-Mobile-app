@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:salon_app/screens/login.dart';
+import 'package:salon_app/screens/time_schedule.dart';
+
 
 class SalonDetailsScreen extends StatefulWidget {
   const SalonDetailsScreen({super.key});
@@ -35,8 +36,8 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
     {'name': 'Jane Smith - Manager', 'image': 'images/salon_image.jpg', 'contact': '0987654321', 'email': 'jane@example.com', 'bio': 'Dedicated manager', 'services': ['Manicure']}
   ];
   final List<Map<String, dynamic>> _workStations = [
-    {'name': 'Station 1', 'description': 'Description for Station 1'},
-    {'name': 'Station 2', 'description': 'Description for Station 2'}
+    {'name': 'Station 1', 'description': 'Description for Station 1', 'services': ['Haircut', 'Coloring']},
+    {'name': 'Station 2', 'description': 'Description for Station 2', 'services': ['Manicure']}
   ];
   bool _showPrices = false;
 
@@ -513,122 +514,190 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
 
   void _showAddWorkStationPopup() {
     final TextEditingController _nameController = TextEditingController();
-    final TextEditingController _descriptionController = TextEditingController();
+    List<String> selectedServices = [];
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Workstation', style: TextStyle(color: Colors.black)),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
         backgroundColor: Colors.white,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Add Workstation',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              const Text(
+                'Services',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              ..._services.map((service) => StatefulBuilder(
+                    builder: (context, setState) => CheckboxListTile(
+                      title: Text(service['service']),
+                      value: selectedServices.contains(service['service']),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            if (!selectedServices.contains(service['service'])) {
+                              selectedServices.add(service['service']);
+                            }
+                          } else {
+                            selectedServices.remove(service['service']);
+                          }
+                        });
+                      },
+                      activeColor: Colors.black,
+                      checkColor: Colors.white,
+                    ),
+                  )),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(backgroundColor: Colors.white),
+                    child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_nameController.text.isNotEmpty && selectedServices.isNotEmpty) {
+                        setState(() {
+                          _workStations.add({
+                            'name': _nameController.text,
+                            'description': '',
+                            'services': selectedServices,
+                          });
+                        });
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please fill the name and select at least one service')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Save', style: TextStyle(color: Colors.black)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(backgroundColor: Colors.white),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _workStations.add({
-                  'name': _nameController.text,
-                  'description': _descriptionController.text,
-                });
-              });
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Add', style: TextStyle(color: Colors.black)),
-          ),
-        ],
       ),
     );
   }
 
   void _showEditWorkStationPopup(int index) {
     final TextEditingController _nameController = TextEditingController(text: _workStations[index]['name']);
-    final TextEditingController _descriptionController = TextEditingController(text: _workStations[index]['description']);
+    List<String> selectedServices = List.from(_workStations[index]['services']);
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Workstation', style: TextStyle(color: Colors.black)),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
         backgroundColor: Colors.white,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Edit Workstation',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white,
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              const Text(
+                'Services',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              ..._services.map((service) => StatefulBuilder(
+                    builder: (context, setState) => CheckboxListTile(
+                      title: Text(service['service']),
+                      value: selectedServices.contains(service['service']),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            if (!selectedServices.contains(service['service'])) {
+                              selectedServices.add(service['service']);
+                            }
+                          } else {
+                            selectedServices.remove(service['service']);
+                          }
+                        });
+                      },
+                      activeColor: Colors.black,
+                      checkColor: Colors.white,
+                    ),
+                  )),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(backgroundColor: Colors.white),
+                    child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_nameController.text.isNotEmpty && selectedServices.isNotEmpty) {
+                        setState(() {
+                          _workStations[index] = {
+                            'name': _nameController.text,
+                            'description': '',
+                            'services': selectedServices,
+                          };
+                        });
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please fill the name and select at least one service')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Save', style: TextStyle(color: Colors.black)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(backgroundColor: Colors.white),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _workStations[index] = {
-                  'name': _nameController.text,
-                  'description': _descriptionController.text,
-                };
-              });
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Save', style: TextStyle(color: Colors.black)),
-          ),
-        ],
       ),
     );
   }
@@ -866,7 +935,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 28, 2025, 09:03 PM +0530',
+                    'Current Date & Time: July 29, 2025, 04:19 PM +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
@@ -1183,11 +1252,18 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Center(
-                    child: Text(
-                      'Workstations',
-                      style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Workstations',
+                        style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.black54),
+                        onPressed: () => _showEditWorkStationPopup(0), // Edit first workstation by default
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   Center(
@@ -1209,14 +1285,9 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                             style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                           ),
                           const SizedBox(height: 5),
-                          TextField(
-                            controller: TextEditingController(text: station['description']),
-                            maxLines: 3,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                          Text(
+                            'Services: ${station['services'].join(', ')}',
+                            style: const TextStyle(color: Colors.black54),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -1274,14 +1345,14 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    MaterialPageRoute(builder: (_) => const TimeScheduleScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const Text('Back', style: TextStyle(color: Colors.black)),
+                child: const Text('Next', style: TextStyle(color: Colors.black)),
               ),
             ),
           ],
