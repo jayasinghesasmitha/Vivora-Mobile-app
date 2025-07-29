@@ -13,9 +13,9 @@ class TimeScheduleScreen extends StatefulWidget {
 class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
   String selectedOption = 'All';
   final List<Map<String, dynamic>> employees = [
-    {'name': 'John Doe', 'image': 'images/salon_image.jpg'},
-    {'name': 'Jane Smith', 'image': 'images/salon_image.jpg'},
-    {'name': 'Mike Johnson', 'image': 'images/salon_image.jpg'},
+    {'name': 'Kasun', 'image': 'images/salon_image.jpg'},
+    {'name': 'Ruwan', 'image': 'images/salon_image.jpg'},
+    {'name': 'Amal', 'image': 'images/salon_image.jpg'},
   ];
   int selectedDays = 1;
   final List<DateTime> days = [
@@ -35,6 +35,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
       {'time': '10:00 AM', 'employees': [true, true, false]},
     ],
   };
+  Set<String> selectedEmployees = {'Kasun', 'Ruwan', 'Amal'};
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +44,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
         title: const Text('VIVORA', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
       ),
       backgroundColor: Colors.white,
       body: Padding(
@@ -50,35 +52,32 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text('Salon Name', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text('Salon Name', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
-                Row(
-                  children: [
-                    Image.asset(
-                      'images/salon_image.jpg',
-                      height: 50,
-                      width: 50,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error, color: Colors.red);
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SalonDetailsScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: const Text('Edit Profile', style: TextStyle(color: Colors.black)),
-                    ),
-                  ],
+                Image.asset(
+                  'images/salon_image.jpg',
+                  height: 50,
+                  width: 50,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.error, color: Colors.red);
+                  },
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SalonDetailsScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Edit Profile', style: TextStyle(color: Colors.black)),
                 ),
               ],
             ),
@@ -108,24 +107,35 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [
-                  const Icon(Icons.people, color: Colors.black),
-                  ...employees.map((employee) => Row(
-                        children: [
-                          Image.asset(
-                            employee['image'],
-                            height: 40,
-                            width: 40,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.error, color: Colors.red);
-                            },
-                          ),
-                          const SizedBox(width: 5),
-                          Text(employee['name'], style: const TextStyle(color: Colors.black)),
-                          const SizedBox(width: 10),
-                        ],
-                      )),
-                ],
+                children: employees.map((employee) => Row(
+                      children: [
+                        Checkbox(
+                          value: selectedEmployees.contains(employee['name']),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              if (value == true) {
+                                selectedEmployees.add(employee['name']);
+                              } else {
+                                selectedEmployees.remove(employee['name']);
+                              }
+                            });
+                          },
+                          activeColor: Colors.black,
+                          checkColor: Colors.white,
+                        ),
+                        Image.asset(
+                          employee['image'],
+                          height: 40,
+                          width: 40,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.error, color: Colors.red);
+                          },
+                        ),
+                        const SizedBox(width: 5),
+                        Text(employee['name'], style: const TextStyle(color: Colors.black)),
+                        const SizedBox(width: 10),
+                      ],
+                    )).toList(),
               ),
             ),
             const SizedBox(height: 20),
@@ -144,19 +154,45 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
             ),
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [1, 2, 3].map((dayCount) => GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedDays = dayCount;
-                      });
-                    },
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: selectedDays == dayCount ? Colors.black : Colors.grey,
-                      child: Text('$dayCount days', style: TextStyle(color: Colors.white)),
-                    ),
-                  )).toList(),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedDays = 1;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedDays == 1 ? Colors.black : Colors.grey,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('1 Day', style: TextStyle(color: Colors.white)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedDays = 2;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedDays == 2 ? Colors.black : Colors.grey,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('2 Days', style: TextStyle(color: Colors.white)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedDays = 3;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedDays == 3 ? Colors.black : Colors.grey,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('3 Days', style: TextStyle(color: Colors.white)),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -177,22 +213,30 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                         final time = '${startHour.toString().padLeft(2, '0')}:${startMin.toString().padLeft(2, '0')} ${startHour < 12 ? 'AM' : 'PM'}';
                         final slot = slots.firstWhere((s) => s['time'] == time, orElse: () => {'time': time, 'employees': [false, false, false]});
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Row(
                             children: [
                               SizedBox(
-                                width: 100,
-                                child: Text(slot['time'], style: const TextStyle(color: Colors.black)),
+                                width: 120,
+                                child: Text(slot['time'], style: const TextStyle(color: Colors.black, fontSize: 16)),
                               ),
                               ...List.generate(3, (empIndex) {
-                                final color = slot['employees'][empIndex]
+                                final employeeName = ['Kasun', 'Ruwan', 'Amal'][empIndex];
+                                final isSelected = selectedEmployees.contains(employeeName);
+                                final isAvailable = slot['employees'][empIndex] && isSelected;
+                                final color = isAvailable
                                     ? [Colors.red, Colors.green, Colors.blue][empIndex]
                                     : Colors.white;
                                 return Container(
-                                  width: 30,
-                                  height: 30,
+                                  width: 40,
+                                  height: 40,
                                   color: color,
                                   margin: const EdgeInsets.only(right: 5),
+                                  child: Center(
+                                    child: isAvailable
+                                        ? Text(employeeName, style: const TextStyle(color: Colors.white, fontSize: 12))
+                                        : null,
+                                  ),
                                 );
                               }),
                             ],
