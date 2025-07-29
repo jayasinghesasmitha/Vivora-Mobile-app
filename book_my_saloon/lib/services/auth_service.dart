@@ -1,56 +1,49 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// lib/services/auth_service.dart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static const String baseUrl = 'http://localhost:3000/api/auth/login'; 
 
-  // Login with email and password
-  Future<UserCredential> loginUser(String email, String password) async {
+  // Login method
+  Future<String> login(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return userCredential;
-    } on FirebaseAuthException catch (e) {
-      throw e;
+      final response = await http.post(
+        Uri.parse('$baseUrl/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['token']; // Return JWT token
+      } else {
+        final data = jsonDecode(response.body);
+        throw Exception(data['error'] ?? 'Login failed');
+      }
+    } catch (e) {
+      throw Exception('Login error: $e');
     }
   }
 
-  // Register with email, password and name
-  Future<UserCredential> registerUser(
-      String name, String email, String password) async {
+  // Signup method
+  Future<String> signup(String email, String password) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final response = await http.post(
+        Uri.parse('$baseUrl/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      ).timeout(const Duration(seconds: 10));
 
-      // Save user data to Firestore
-      await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-            'name': name,
-            'email': email,
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-
-      return userCredential;
-    } on FirebaseAuthException catch (e) {
-      throw e;
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return data['token']; // Return JWT token
+      } else {
+        final data = jsonDecode(response.body);
+        throw Exception(data['error'] ?? 'Signup failed');
+      }
+    } catch (e) {
+      throw Exception('Signup error: $e');
     }
-  }
-
-  // Sign out
-  Future<void> signOut() async {
-    await _auth.signOut();
-  }
-
-  // Get current user
-  User? getCurrentUser() {
-    return _auth.currentUser;
   }
 }
