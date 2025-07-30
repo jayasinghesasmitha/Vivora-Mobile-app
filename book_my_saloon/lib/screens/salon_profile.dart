@@ -156,7 +156,8 @@ class _SalonProfileState extends State<SalonProfile> {
                       builder: (context, child) {
                         double value = 1.0;
                         if (_pageController.position.hasPixels) {
-                          value = _pageController.page! - index;
+                          final double page = _pageController.page ?? 0;
+                          value = page - index;
                           value = (1 - (value.abs() * 0.3)).clamp(0.7, 1.0); // Smooth scale transition
                         }
                         return Transform.scale(
