@@ -18,6 +18,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
     {'name': 'Amal', 'image': 'images/salon_image.jpg'},
   ];
   int selectedDays = 1;
+  DateTime? selectedDate;
   final List<DateTime> days = [
     DateTime(2025, 7, 29), // Tuesday
     DateTime(2025, 7, 30), // Wednesday
@@ -55,7 +56,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
             const Text('Salon Name', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset(
                   'images/salon_image.jpg',
@@ -97,6 +98,11 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedOption = newValue!;
+                      if (newValue == 'All') {
+                        selectedEmployees = {'Kasun', 'Ruwan', 'Amal'};
+                      } else {
+                        selectedEmployees.clear();
+                      }
                     });
                   },
                   dropdownColor: Colors.white,
@@ -111,15 +117,17 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                       children: [
                         Checkbox(
                           value: selectedEmployees.contains(employee['name']),
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                selectedEmployees.add(employee['name']);
-                              } else {
-                                selectedEmployees.remove(employee['name']);
-                              }
-                            });
-                          },
+                          onChanged: selectedOption == 'All'
+                              ? null
+                              : (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      selectedEmployees.add(employee['name']);
+                                    } else {
+                                      selectedEmployees.remove(employee['name']);
+                                    }
+                                  });
+                                },
                           activeColor: Colors.black,
                           checkColor: Colors.white,
                         ),
@@ -160,6 +168,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                   onPressed: () {
                     setState(() {
                       selectedDays = 1;
+                      selectedDate = days[0];
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -172,6 +181,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                   onPressed: () {
                     setState(() {
                       selectedDays = 2;
+                      selectedDate = days[0];
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -184,6 +194,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                   onPressed: () {
                     setState(() {
                       selectedDays = 3;
+                      selectedDate = days[0];
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -194,59 +205,83 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            if (selectedDays > 0)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: days.sublist(0, selectedDays).map((date) => Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedDate = date;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: selectedDate == date ? Colors.black : Colors.grey,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: Text('${date.day}/${date.month}/${date.year}', style: const TextStyle(color: Colors.white)),
+                        ),
+                      )).toList(),
+                ),
+              ),
             const SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
-                itemCount: selectedDays,
-                itemBuilder: (context, index) {
-                  final date = days[index];
-                  final slots = timeSlots[date] ?? [];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${date.day}/${date.month}/${date.year} (${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][date.weekday - 1]})',
-                          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      ...List.generate(16, (slotIndex) {
-                        final startHour = 8 + (slotIndex ~/ 2);
-                        final startMin = (slotIndex % 2) * 30;
-                        final time = '${startHour.toString().padLeft(2, '0')}:${startMin.toString().padLeft(2, '0')} ${startHour < 12 ? 'AM' : 'PM'}';
-                        final slot = slots.firstWhere((s) => s['time'] == time, orElse: () => {'time': time, 'employees': [false, false, false]});
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                child: Text(slot['time'], style: const TextStyle(color: Colors.black, fontSize: 16)),
-                              ),
-                              ...List.generate(3, (empIndex) {
-                                final employeeName = ['Kasun', 'Ruwan', 'Amal'][empIndex];
-                                final isSelected = selectedEmployees.contains(employeeName);
-                                final isAvailable = slot['employees'][empIndex] && isSelected;
-                                final color = isAvailable
-                                    ? [Colors.red, Colors.green, Colors.blue][empIndex]
-                                    : Colors.white;
-                                return Container(
-                                  width: 40,
-                                  height: 40,
-                                  color: color,
-                                  margin: const EdgeInsets.only(right: 5),
-                                  child: Center(
-                                    child: isAvailable
-                                        ? Text(employeeName, style: const TextStyle(color: Colors.white, fontSize: 12))
-                                        : null,
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
+              child: selectedDate != null
+                  ? ListView.builder(
+                      itemCount: 1,
+                      itemBuilder: (context, index) {
+                        final date = selectedDate!;
+                        final slots = timeSlots[date] ?? [];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${date.day}/${date.month}/${date.year} (${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][date.weekday - 1]})',
+                                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 10),
+                            ...List.generate(16, (slotIndex) {
+                              final startHour = 8 + (slotIndex ~/ 2);
+                              final startMin = (slotIndex % 2) * 30;
+                              final time = '${startHour.toString().padLeft(2, '0')}:${startMin.toString().padLeft(2, '0')} ${startHour < 12 ? 'AM' : 'PM'}';
+                              final slot = slots.firstWhere((s) => s['time'] == time, orElse: () => {'time': time, 'employees': [false, false, false]});
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 120,
+                                      child: Text(slot['time'], style: const TextStyle(color: Colors.black, fontSize: 16)),
+                                    ),
+                                    ...List.generate(3, (empIndex) {
+                                      final employeeName = ['Kasun', 'Ruwan', 'Amal'][empIndex];
+                                      final isSelected = selectedEmployees.contains(employeeName);
+                                      final isAvailable = slot['employees'][empIndex] && isSelected;
+                                      final color = isAvailable
+                                          ? [Colors.red[200], Colors.green[200], Colors.blue[200]][empIndex]
+                                          : Colors.white;
+                                      return Container(
+                                        width: 70,
+                                        height: 40,
+                                        color: color,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: Center(
+                                          child: isAvailable
+                                              ? Text(employeeName, style: const TextStyle(color: Colors.black, fontSize: 12))
+                                              : null,
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
                         );
-                      }),
-                    ],
-                  );
-                },
-              ),
+                      },
+                    )
+                  : const SizedBox.shrink(),
             ),
             const SizedBox(height: 20),
             Center(
