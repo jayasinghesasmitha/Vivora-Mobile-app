@@ -875,7 +875,6 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                     ],
                   ),
                   ..._openingDays.asMap().entries.map((entry) {
-                    final index = entry.key;
                     final dayData = entry.value;
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
