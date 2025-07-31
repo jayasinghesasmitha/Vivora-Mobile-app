@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:salon_app/screens/add_slot.dart';
 import 'package:salon_app/screens/edit_slot.dart';
 import 'package:salon_app/screens/salon_details.dart';
+import 'package:salon_app/screens/setting.dart'; // Import settings.dart
 
 class TimeScheduleScreen extends StatefulWidget {
   const TimeScheduleScreen({super.key});
@@ -61,7 +62,12 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black, size: 24),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SettingsScreen()),
+              );
+            },
           ),
         ],
       ),
