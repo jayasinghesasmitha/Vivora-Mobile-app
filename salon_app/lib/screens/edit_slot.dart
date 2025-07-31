@@ -10,10 +10,15 @@ class EditSlotScreen extends StatefulWidget {
 }
 
 class _EditSlotScreenState extends State<EditSlotScreen> {
-  final String employee = 'Sunil'; // Mock data, replace with actual data
-  final DateTime date = DateTime.now(); // Mock data, replace with actual data
+  final Map<String, String> employee = {'name': 'Sunil', 'image': 'images/placeholder.png'}; // Mock data
+  final DateTime date = DateTime.now(); // Mock data, current date: 08:56 PM +0530, July 31, 2025
   final TextEditingController _customerNameController = TextEditingController(text: 'John Doe'); // Mock data
-  final Set<String> selectedServices = {'Haircut', 'Manicure'}; // Mock data
+  final Map<String, double> services = {
+    'Haircut': 20.0,
+    'Manicure': 15.0,
+    'Pedicure': 25.0,
+  }; // Mock data with prices
+  final Set<String> selectedServices = {'Haircut', 'Manicure', 'Pedicure'}; // Initially all ticked
   final String selectedTimeSlot = '10:00'; // Mock data
   String? _selectedIcon; // To track selected icon (null, 'traveller', or 'call')
 
@@ -23,6 +28,16 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
         _selectedIcon = null; // Deselect if the same icon is clicked again
       } else {
         _selectedIcon = iconType; // Select the new icon, deselecting the other
+      }
+    });
+  }
+
+  void toggleServiceSelection(String service) {
+    setState(() {
+      if (selectedServices.contains(service)) {
+        selectedServices.remove(service);
+      } else {
+        selectedServices.add(service);
       }
     });
   }
@@ -74,12 +89,41 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage(employee['image']!),
+                      backgroundColor: Colors.grey[200],
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      employee['name']!,
+                      style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey[200],
+                  child: Text(
+                    '${date.day}',
+                    style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Text(
-              'Employee: $employee | Date: ${date.day}/${date.month}/${date.year}',
-              style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+              'Day: ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][date.weekday - 1]}',
+              style: const TextStyle(color: Colors.black, fontSize: 16),
             ),
             const SizedBox(height: 20),
             Row(
@@ -113,53 +157,75 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
             const SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: selectedServices.map((service) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text(service, style: const TextStyle(color: Colors.black, fontSize: 14)),
+              children: services.entries.map((entry) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: selectedServices.contains(entry.key),
+                            onChanged: (value) => toggleServiceSelection(entry.key),
+                            checkColor: Colors.black,
+                            activeColor: Colors.black,
+                          ),
+                          Text(entry.key, style: const TextStyle(color: Colors.black, fontSize: 14)),
+                        ],
+                      ),
+                      Text('\$${entry.value}', style: const TextStyle(color: Colors.black, fontSize: 14)),
+                    ],
                   )).toList(),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Time Slot',
-              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              selectedTimeSlot,
-              style: const TextStyle(color: Colors.black, fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: editBooking,
-                  child: const Text('Edit Booking', style: TextStyle(color: Colors.white, fontSize: 16)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            // Centered section for time slot and buttons
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Minimize height to center content
+                children: [
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Text(selectedTimeSlot, style: const TextStyle(color: Colors.black, fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      minimumSize: const Size(200, 0), // Increased width to 200
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: cancelBooking,
-                  child: const Text('Cancel Booking', style: TextStyle(color: Colors.white, fontSize: 16)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: editBooking,
+                    child: const Text('Edit Booking', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      minimumSize: const Size(400, 0), // Increased width to 200
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: confirmBooking,
-                  child: const Text('Confirm', style: TextStyle(color: Colors.white, fontSize: 16)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: cancelBooking,
+                    child: const Text('Cancel Booking', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      minimumSize: const Size(400, 0), // Increased width to 200
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: confirmBooking,
+                    child: const Text('Confirm', style: TextStyle(color: Colors.black, fontSize: 16)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      minimumSize: const Size(400, 0), // Increased width to 200
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Colors.black)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
