@@ -1344,7 +1344,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const TimeScheduleScreen()),
+                    MaterialPageRoute(builder: (_) => TimeScheduleScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
