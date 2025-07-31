@@ -12,7 +12,11 @@ class AddSlotScreen extends StatefulWidget {
 class _AddSlotScreenState extends State<AddSlotScreen> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController(text: 'John Doe');
-  final List<String> services = ['Haircut', 'Manicure', 'Pedicure'];
+  final Map<String, double> services = {
+    'Haircut': 20.0,
+    'Manicure': 15.0,
+    'Pedicure': 25.0,
+  }; // Services with prices
   final Set<String> selectedServices = {};
   final List<Map<String, dynamic>> employees = [
     {'name': 'All', 'image': 'images/placeholder.png'},
@@ -88,8 +92,8 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredServices = services
-        .where((service) => service.toLowerCase().contains(_searchController.text.toLowerCase()))
+    final filteredServices = services.entries
+        .where((entry) => entry.key.toLowerCase().contains(_searchController.text.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -149,6 +153,7 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _searchController,
+              onChanged: (value) => setState(() {}), // Trigger rebuild on text change
               decoration: InputDecoration(
                 hintText: 'Search services...',
                 prefixIcon: const Icon(Icons.search, color: Colors.black, size: 16),
@@ -162,15 +167,21 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
             const SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: filteredServices.map((service) => Row(
+              children: filteredServices.map((entry) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Checkbox(
-                        value: selectedServices.contains(service),
-                        onChanged: (value) => toggleServiceSelection(service),
-                        checkColor: Colors.black,
-                        activeColor: Colors.black,
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: selectedServices.contains(entry.key),
+                            onChanged: (value) => toggleServiceSelection(entry.key),
+                            checkColor: Colors.black,
+                            activeColor: Colors.black,
+                          ),
+                          Text(entry.key, style: const TextStyle(fontSize: 14)),
+                        ],
                       ),
-                      Text(service, style: const TextStyle(fontSize: 14)),
+                      Text('\$${entry.value}', style: const TextStyle(color: Colors.black, fontSize: 14)),
                     ],
                   )).toList(),
             ),
