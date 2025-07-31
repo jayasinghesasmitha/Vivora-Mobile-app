@@ -79,12 +79,6 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
         elevation: 0,
         title: const Text('Edit Time Slot', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black, size: 24),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
