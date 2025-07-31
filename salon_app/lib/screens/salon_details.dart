@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:salon_app/screens/time_schedule.dart';
 
-
 class SalonDetailsScreen extends StatefulWidget {
   const SalonDetailsScreen({super.key});
 
@@ -101,7 +100,9 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 DropdownButton<int>(
                   value: tempStartHour * 2 + (tempStartMin ~/ 30),
@@ -131,7 +132,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
-                const SizedBox(width: 2),
+                const SizedBox(width: 10),
                 DropdownButton<String>(
                   value: tempStartPeriod,
                   items: ['AM', 'PM'].map((String period) {
@@ -151,7 +152,13 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
-                const Text(' - ', style: TextStyle(color: Colors.black)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text('End Time', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 DropdownButton<int>(
                   value: tempEndHour * 2 + (tempEndMin ~/ 30),
                   items: List.generate(48, (index) {
@@ -180,7 +187,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   dropdownColor: Colors.white,
                   iconSize: 20,
                 ),
-                const SizedBox(width: 2),
+                const SizedBox(width: 10),
                 DropdownButton<String>(
                   value: tempEndPeriod,
                   items: ['AM', 'PM'].map((String period) {
@@ -934,7 +941,7 @@ class _SalonDetailsScreenState extends State<SalonDetailsScreen> {
                   }),
                   const SizedBox(height: 10),
                   Text(
-                    'Current Date & Time: July 29, 2025, 04:19 PM +0530',
+                    'Current Date & Time: ${DateTime.now().toString().split('.')[0]} +0530',
                     style: TextStyle(color: Colors.black54),
                   ),
                   const SizedBox(height: 10),
