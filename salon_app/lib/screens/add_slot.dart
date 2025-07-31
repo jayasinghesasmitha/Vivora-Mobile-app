@@ -103,12 +103,6 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
         elevation: 0,
         title: const Text('Add Time Slot', style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black, size: 24),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
