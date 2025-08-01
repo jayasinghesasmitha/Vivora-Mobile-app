@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:salon_app/screens/edit_slot.dart';
-import 'package:salon_app/screens/time_schedule.dart'; // Import time_schedule.dart
+import 'package:salon_app/screens/time_schedule.dart';
 
 class AddSlotScreen extends StatefulWidget {
-  const AddSlotScreen({super.key});
+  final List<Map<String, dynamic>> bookedSlots;
+
+  const AddSlotScreen({super.key, required this.bookedSlots});
 
   @override
   _AddSlotScreenState createState() => _AddSlotScreenState();
@@ -16,7 +18,7 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
     'Haircut': 20.0,
     'Manicure': 15.0,
     'Pedicure': 25.0,
-  }; // Services with prices
+  };
   final Set<String> selectedServices = {};
   final List<Map<String, dynamic>> employees = [
     {'name': 'All', 'image': 'images/placeholder.png'},
@@ -28,7 +30,7 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
   final List<DateTime> availableDays = List.generate(7, (index) => DateTime.now().add(Duration(days: index)));
   DateTime _selectedDay = DateTime.now();
   final Set<String> selectedTimeSlots = {};
-  String? _selectedIcon; // To track selected icon (null, 'traveller', or 'call')
+  String? _selectedIcon;
 
   void toggleServiceSelection(String service) {
     setState(() {
@@ -79,15 +81,39 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
   void toggleIconSelection(String iconType) {
     setState(() {
       if (_selectedIcon == iconType) {
-        _selectedIcon = null; // Deselect if the same icon is clicked again
+        _selectedIcon = null;
       } else {
-        _selectedIcon = iconType; // Select the new icon, deselecting the other
+        _selectedIcon = iconType;
       }
     });
   }
 
   bool canAddSlot() {
     return selectedServices.isNotEmpty && selectedEmployees.isNotEmpty && selectedTimeSlots.isNotEmpty;
+  }
+
+  void addSlot() {
+    final newSlots = List<Map<String, dynamic>>.from(widget.bookedSlots);
+    for (var employee in selectedEmployees) {
+      if (employee != 'All') {
+        for (var time in selectedTimeSlots) {
+          newSlots.add({
+            'employee': employee,
+            'customerName': _customerNameController.text,
+            'date': _selectedDay,
+            'time': time,
+            'type': _selectedIcon ?? 'booking',
+            'services': List.from(selectedServices),
+          });
+        }
+      }
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TimeScheduleScreen(bookedSlots: newSlots),
+      ),
+    );
   }
 
   @override
@@ -147,7 +173,7 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: _searchController,
-              onChanged: (value) => setState(() {}), // Trigger rebuild on text change
+              onChanged: (value) => setState(() {}),
               decoration: InputDecoration(
                 hintText: 'Search services...',
                 prefixIcon: const Icon(Icons.search, color: Colors.black, size: 16),
@@ -283,7 +309,8 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
                           ),
                         ),
                       ),
-                    ));
+                    ),
+                  );
                 },
               ),
             ),
@@ -291,12 +318,7 @@ class _AddSlotScreenState extends State<AddSlotScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: ElevatedButton(
-                onPressed: canAddSlot() ? () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const TimeScheduleScreen()),
-                  );
-                } : null,
+                onPressed: canAddSlot() ? addSlot : null,
                 child: const Text('Add', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: canAddSlot() ? Colors.black : Colors.grey,
