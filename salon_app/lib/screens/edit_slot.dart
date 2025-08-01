@@ -3,31 +3,45 @@ import 'package:salon_app/screens/add_slot.dart';
 import 'package:salon_app/screens/time_schedule.dart';
 
 class EditSlotScreen extends StatefulWidget {
-  const EditSlotScreen({super.key});
+  final Map<String, dynamic> slotDetails;
+  final List<Map<String, dynamic>> bookedSlots;
+
+  const EditSlotScreen({super.key, required this.slotDetails, required this.bookedSlots});
 
   @override
   _EditSlotScreenState createState() => _EditSlotScreenState();
 }
 
 class _EditSlotScreenState extends State<EditSlotScreen> {
-  final Map<String, String> employee = {'name': 'Sunil', 'image': 'images/placeholder.png'}; // Mock data
-  final DateTime date = DateTime.now(); // Mock data, current date: 08:56 PM +0530, July 31, 2025
-  final TextEditingController _customerNameController = TextEditingController(text: 'John Doe'); // Mock data
+  late TextEditingController _customerNameController;
+  late Set<String> selectedServices;
+  late String? _selectedIcon;
+  late String selectedTimeSlot;
+  late Map<String, dynamic> employee;
+  late DateTime date;
   final Map<String, double> services = {
     'Haircut': 20.0,
     'Manicure': 15.0,
     'Pedicure': 25.0,
-  }; // Mock data with prices
-  final Set<String> selectedServices = {'Haircut', 'Manicure', 'Pedicure'}; // Initially all ticked
-  final String selectedTimeSlot = '10:00'; // Mock data
-  String? _selectedIcon; // To track selected icon (null, 'traveller', or 'call')
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _customerNameController = TextEditingController(text: widget.slotDetails['customerName']);
+    selectedServices = Set.from(widget.slotDetails['services']);
+    _selectedIcon = widget.slotDetails['type'];
+    selectedTimeSlot = widget.slotDetails['time'];
+    employee = {'name': widget.slotDetails['employee'], 'image': 'images/placeholder.png'};
+    date = widget.slotDetails['date'];
+  }
 
   void toggleIconSelection(String iconType) {
     setState(() {
       if (_selectedIcon == iconType) {
-        _selectedIcon = null; // Deselect if the same icon is clicked again
+        _selectedIcon = null;
       } else {
-        _selectedIcon = iconType; // Select the new icon, deselecting the other
+        _selectedIcon = iconType;
       }
     });
   }
@@ -43,31 +57,56 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
   }
 
   void editBooking() {
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddSlotScreen(
-          // Pass current details to AddSlotScreen if it accepts parameters
-          // Example: AddSlotScreen(employee: employee, date: date, ...),
-        ),
+        builder: (context) => AddSlotScreen(bookedSlots: widget.bookedSlots),
       ),
     );
   }
 
   void cancelBooking() {
+    final updatedSlots = List<Map<String, dynamic>>.from(widget.bookedSlots)
+      ..removeWhere(
+        (slot) =>
+            slot['employee'] == employee['name'] &&
+            slot['time'] == selectedTimeSlot &&
+            slot['date'].day == date.day &&
+            slot['date'].month == date.month &&
+            slot['date'].year == date.year,
+      );
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const TimeScheduleScreen()),
+      MaterialPageRoute(
+        builder: (context) => TimeScheduleScreen(bookedSlots: updatedSlots),
+      ),
     );
-    // Logic to clear the selected cell in TimeScheduleScreen should be handled there
   }
 
   void confirmBooking() {
+    final updatedSlots = List<Map<String, dynamic>>.from(widget.bookedSlots);
+    updatedSlots.removeWhere(
+      (slot) =>
+          slot['employee'] == employee['name'] &&
+          slot['time'] == selectedTimeSlot &&
+          slot['date'].day == date.day &&
+          slot['date'].month == date.month &&
+          slot['date'].year == date.year,
+    );
+    updatedSlots.add({
+      'employee': employee['name'],
+      'customerName': _customerNameController.text,
+      'date': date,
+      'time': selectedTimeSlot,
+      'type': _selectedIcon ?? 'booking',
+      'services': List.from(selectedServices),
+    });
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const TimeScheduleScreen()),
+      MaterialPageRoute(
+        builder: (context) => TimeScheduleScreen(bookedSlots: updatedSlots),
+      ),
     );
-    // Logic to update TimeScheduleScreen with changes should be handled there
   }
 
   @override
@@ -170,10 +209,9 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
                   )).toList(),
             ),
             const SizedBox(height: 20),
-            // Centered section for time slot and buttons
             Center(
               child: Column(
-                mainAxisSize: MainAxisSize.min, // Minimize height to center content
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
                     onPressed: () {},
@@ -181,7 +219,7 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      minimumSize: const Size(200, 0), // Increased width to 200
+                      minimumSize: const Size(200, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -192,7 +230,7 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      minimumSize: const Size(400, 0), // Increased width to 200
+                      minimumSize: const Size(400, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -203,7 +241,7 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      minimumSize: const Size(400, 0), // Increased width to 200
+                      minimumSize: const Size(400, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -214,7 +252,7 @@ class _EditSlotScreenState extends State<EditSlotScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      minimumSize: const Size(400, 0), // Increased width to 200
+                      minimumSize: const Size(400, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Colors.black)),
                     ),
                   ),
