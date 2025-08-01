@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:salon_app/screens/add_slot.dart';
 import 'package:salon_app/screens/edit_slot.dart';
 import 'package:salon_app/screens/salon_details.dart';
-import 'package:salon_app/screens/setting.dart'; // Import settings.dart
+import 'package:salon_app/screens/setting.dart';
 
 class TimeScheduleScreen extends StatefulWidget {
-  const TimeScheduleScreen({super.key});
+  final List<Map<String, dynamic>>? bookedSlots;
+
+  const TimeScheduleScreen({super.key, this.bookedSlots});
 
   @override
   _TimeScheduleScreenState createState() => _TimeScheduleScreenState();
@@ -23,10 +25,12 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
   final List<DateTime> dates = [];
   Set<String> selectedEmployees = {'All', 'Sunil', 'Nimal', 'Kamal'};
   final List<Color> slotColors = [Colors.pink[50]!, Colors.green[50]!, Colors.blue[50]!];
+  List<Map<String, dynamic>> bookedSlots = [];
 
   @override
   void initState() {
     super.initState();
+    bookedSlots = widget.bookedSlots ?? [];
     for (int i = 0; i < 7; i++) {
       dates.add(DateTime.now().add(Duration(days: i)));
     }
@@ -48,6 +52,22 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
         }
       }
     });
+  }
+
+  Map<String, dynamic>? getSlotDetails(String employee, String time, DateTime date) {
+    try {
+      return bookedSlots.firstWhere(
+        (slot) =>
+            slot['employee'] == employee &&
+            slot['time'] == time &&
+            slot['date'].day == date.day &&
+            slot['date'].month == date.month &&
+            slot['date'].year == date.year,
+        orElse: () => {},
+      );
+    } catch (e) {
+      return {};
+    }
   }
 
   @override
@@ -119,8 +139,16 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const AddSlotScreen()),
-                            );
+                              MaterialPageRoute(
+                                builder: (_) => AddSlotScreen(bookedSlots: bookedSlots),
+                              ),
+                            ).then((value) {
+                              if (value != null) {
+                                setState(() {
+                                  bookedSlots = value as List<Map<String, dynamic>>;
+                                });
+                              }
+                            });
                           },
                           child: const Text('ADD SLOT', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
@@ -204,24 +232,53 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                                         children: List.generate(3, (empIndex) {
                                           final employeeName = ['Sunil', 'Nimal', 'Kamal'][empIndex];
                                           final isVisible = selectedEmployees.contains('All') || selectedEmployees.contains(employeeName);
+                                          final slotDetails = getSlotDetails(employeeName, '${hour.toString().padLeft(2, '0')}:00', _currentDate);
                                           return Expanded(
                                             child: GestureDetector(
-                                              onTap: isVisible
+                                              onTap: isVisible && slotDetails!.isNotEmpty
                                                   ? () {
                                                       Navigator.push(
                                                         context,
-                                                        MaterialPageRoute(builder: (_) => const EditSlotScreen()),
+                                                        MaterialPageRoute(
+                                                          builder: (_) => EditSlotScreen(
+                                                            slotDetails: slotDetails,
+                                                            bookedSlots: bookedSlots,
+                                                          ),
+                                                        ),
                                                       );
                                                     }
                                                   : null,
                                               child: Container(
                                                 height: 60,
                                                 decoration: BoxDecoration(
-                                                  color: isVisible ? slotColors[empIndex % slotColors.length] : Colors.white,
+                                                  color: isVisible && slotDetails!.isNotEmpty
+                                                      ? slotColors[empIndex % slotColors.length]
+                                                      : Colors.white,
                                                   border: Border.all(color: Colors.grey[300]!, width: 0.5),
                                                   borderRadius: BorderRadius.circular(8),
                                                 ),
                                                 margin: const EdgeInsets.all(2),
+                                                child: slotDetails!.isNotEmpty && isVisible
+                                                    ? Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Icon(
+                                                            slotDetails['type'] == 'traveller'
+                                                                ? Icons.directions_walk
+                                                                : slotDetails['type'] == 'call'
+                                                                    ? Icons.call
+                                                                    : Icons.book,
+                                                            size: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                          const SizedBox(width: 4),
+                                                          Text(
+                                                            slotDetails['customerName'],
+                                                            style: const TextStyle(fontSize: 12, color: Colors.black),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : null,
                                               ),
                                             ),
                                           );
@@ -230,10 +287,11 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                                     ),
                                   ],
                                 ),
-                                if (index < 23) Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8.0, right: 12.0),
+                                if (index < 23)
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0, right: 12.0),
                                       child: Text(
                                         '${hour.toString().padLeft(2, '0')}:30',
                                         style: const TextStyle(color: Colors.black, fontSize: 16),
@@ -244,24 +302,53 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                                         children: List.generate(3, (empIndex) {
                                           final employeeName = ['Sunil', 'Nimal', 'Kamal'][empIndex];
                                           final isVisible = selectedEmployees.contains('All') || selectedEmployees.contains(employeeName);
+                                          final slotDetails = getSlotDetails(employeeName, '${hour.toString().padLeft(2, '0')}:30', _currentDate);
                                           return Expanded(
                                             child: GestureDetector(
-                                              onTap: isVisible
+                                              onTap: isVisible && slotDetails!.isNotEmpty
                                                   ? () {
                                                       Navigator.push(
                                                         context,
-                                                        MaterialPageRoute(builder: (_) => const EditSlotScreen()),
+                                                        MaterialPageRoute(
+                                                          builder: (_) => EditSlotScreen(
+                                                            slotDetails: slotDetails,
+                                                            bookedSlots: bookedSlots,
+                                                          ),
+                                                        ),
                                                       );
                                                     }
                                                   : null,
                                               child: Container(
                                                 height: 60,
                                                 decoration: BoxDecoration(
-                                                  color: isVisible ? slotColors[empIndex % slotColors.length] : Colors.white,
+                                                  color: isVisible && slotDetails!.isNotEmpty
+                                                      ? slotColors[empIndex % slotColors.length]
+                                                      : Colors.white,
                                                   border: Border.all(color: Colors.grey[300]!, width: 0.5),
                                                   borderRadius: BorderRadius.circular(8),
                                                 ),
                                                 margin: const EdgeInsets.all(2),
+                                                child: slotDetails!.isNotEmpty && isVisible
+                                                    ? Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Icon(
+                                                            slotDetails['type'] == 'traveller'
+                                                                ? Icons.directions_walk
+                                                                : slotDetails['type'] == 'call'
+                                                                    ? Icons.call
+                                                                    : Icons.book,
+                                                            size: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                          const SizedBox(width: 4),
+                                                          Text(
+                                                            slotDetails['customerName'],
+                                                            style: const TextStyle(fontSize: 12, color: Colors.black),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : null,
                                               ),
                                             ),
                                           );
@@ -269,7 +356,7 @@ class _TimeScheduleScreenState extends State<TimeScheduleScreen> {
                                       ),
                                     ),
                                   ],
-                                ),
+                              ),
                               ],
                             ),
                           );
